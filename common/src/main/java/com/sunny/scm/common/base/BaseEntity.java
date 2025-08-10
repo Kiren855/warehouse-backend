@@ -14,13 +14,15 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public class BaseEntity implements Serializable {
     @Id
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime creationTimestamp;
 
     @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updateTimestamp;
 }
