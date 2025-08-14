@@ -25,10 +25,13 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     UUID userId;
 
-    @Column(unique = true)
+    @Column(name = "email",unique = true)
     String email;
 
+    @Column(name = "username")
     String username;
+
+    @Column(name = "phone")
     String phone;
 
     @Enumerated(EnumType.STRING)

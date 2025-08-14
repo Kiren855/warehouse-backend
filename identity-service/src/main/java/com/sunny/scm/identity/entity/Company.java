@@ -13,7 +13,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Company extends BaseEntity {
-    @Column(unique = true, nullable = false)
+
+    @Column(name = "name", unique = true, nullable = false)
     String name;
 
     @Column(name = "legal_name")
@@ -22,11 +23,12 @@ public class Company extends BaseEntity {
     @Column(name = "tax_id", unique = true)
     String taxId;
 
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
     String email;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "address", columnDefinition = "TEXT")
     String address;
 
+    @Column(name = "phone")
     String phone;
 }
