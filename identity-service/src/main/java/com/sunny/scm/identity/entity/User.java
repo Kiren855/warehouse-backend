@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     @Column(name = "email",unique = true)
     String email;
 
-    @Column(name = "username")
+    @Column(name = "user name")
     String username;
 
     @Column(name = "phone")
