@@ -1,6 +1,6 @@
 package com.sunny.scm.common.exception;
 
-import com.sunny.scm.common.constant.ErrorCode;
+import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +19,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(RuntimeException exception) {
         ApiResponse<?> response = ApiResponse.builder()
-                .code(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
-                .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
+                .code(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
+                .message(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
                 .build();
 
         return ResponseEntity.badRequest().body(response);
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<?>> handlingAppException(AppException appException) {
         ApiResponse<?> response = ApiResponse.builder()
-                .code(appException.getErrorCode().getCode())
+                .code(appException.getBaseCodeError().getCode())
                 .message(appException.getMessage()).build();
 
         return ResponseEntity.badRequest().body(response);
@@ -37,12 +37,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse<?>> handlingAccessDeniedException(AccessDeniedException exception) {
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
+        GlobalErrorCode globalErrorCode = GlobalErrorCode.UNCATEGORIZED_EXCEPTION;
 
-        return ResponseEntity.status(errorCode.getCode())
+        return ResponseEntity.status(globalErrorCode.getCode())
                 .body(ApiResponse.builder()
-                        .code(errorCode.getCode())
-                        .message(errorCode.getMessage())
+                        .code(globalErrorCode.getCode())
+                        .message(globalErrorCode.getMessage())
                         .build());
     }
 
@@ -50,11 +50,11 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<?>> handlingValidation(MethodArgumentNotValidException exception) {
         String enumKey = exception.getFieldError().getDefaultMessage();
 
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
+        GlobalErrorCode globalErrorCode = GlobalErrorCode.UNCATEGORIZED_EXCEPTION;
 
         Map<String, Object> attributes = null;
         try {
-            errorCode = ErrorCode.valueOf(enumKey);
+            globalErrorCode = GlobalErrorCode.valueOf(enumKey);
 
             var constraintViolation =
                     exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
@@ -67,11 +67,11 @@ public class GlobalExceptionHandler {
 
         ApiResponse<?> apiResponse = new ApiResponse<>();
 
-        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setCode(globalErrorCode.getCode());
         apiResponse.setMessage(
                 Objects.nonNull(attributes)
-                        ? mapAttribute(errorCode.getMessage(), attributes)
-                        : errorCode.getMessage());
+                        ? mapAttribute(globalErrorCode.getMessage(), attributes)
+                        : globalErrorCode.getMessage());
 
         return ResponseEntity.badRequest().body(apiResponse);
     }
