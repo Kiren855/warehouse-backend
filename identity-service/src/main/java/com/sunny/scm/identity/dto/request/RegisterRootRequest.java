@@ -1,6 +1,7 @@
 package com.sunny.scm.identity.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -8,14 +9,39 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRootRequest {
-
+    // company info
     @JsonProperty("company_name")
-    @Size(min = 5)
-    @NotBlank()
+    @Size(min = 5, message = "COMPANY_NAME_INVALID")
+    @NotBlank(message = "COMPANY_NAME_REQUIRED")
     String companyName;
-    String legaName;
+
+    @JsonProperty("company_legal_name")
+    @Size(min = 5, message = "COMPANY_LEGAL_NAME_INVALID")
+    @NotBlank(message = "COMPANY_LEGAL_NAME_REQUIRED")
+    String legalName;
+
+    @JsonProperty("company_tax_id")
+    @Size(min = 5, max = 20, message = "COMPANY_TAX_INVALID")
+    @NotBlank(message = "COMPANY_TAX_REQUIRED")
     String taxId;
-    String companyEmail;
+
+    @JsonProperty("company_email")
+    @NotBlank(message = "COMPANY_ADDRESS_REQUIRED")
     String address;
+
+    @JsonProperty("company_phone")
+    @Size(min = 8, max = 20, message = "COMPANY_PHONE_INVALID")
+    @NotBlank(message = "COMPANY_PHONE_REQUIRED")
     String companyPhone;
+
+    // indentity root info
+    @JsonProperty("email")
+    @Email(message = "EMAIL_INVALID")
+    @NotBlank(message = "EMAIL_REQUIRED")
+    String email;
+
+    @JsonProperty("password")
+    @NotBlank(message = "PASSWORD_REQUIRED")
+    @Size(min = 8, max = 50, message = "PASSWORD_INVALID")
+    String password;
 }
