@@ -3,14 +3,12 @@ package com.sunny.scm.identity.constant;
 import com.sunny.scm.common.base.BaseCodeError;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 
 @Getter
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum IdentityErrorCode implements BaseCodeError {
+public  enum IdentityErrorCode implements BaseCodeError {
     USERNAME_INVALID(10001, "Username must be at least {min} and max {max} characters", HttpStatus.BAD_REQUEST),
     PASSWORD_INVALID(10002,"Password must be at least {min} and max {max} characters", HttpStatus.BAD_REQUEST),
     USERNAME_REQUIRED(10003, "Username not blank", HttpStatus.BAD_REQUEST),
@@ -27,7 +25,28 @@ public enum IdentityErrorCode implements BaseCodeError {
     EMAIL_INVALID(10014, "EMAIL_INVALID", HttpStatus.BAD_REQUEST),
     EMAIL_REQUIRED(10015, "EMAIL_REQUIRED", HttpStatus.BAD_REQUEST),
     ;
+
     int code;
     String message;
     HttpStatus httpStatus;
+    IdentityErrorCode(int code, String message, HttpStatus httpStatus) {
+        this.code = code;
+        this.message = message;
+        this.httpStatus = httpStatus;
+    }
+
+    @Override
+    public int getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
 }
