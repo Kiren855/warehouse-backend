@@ -4,6 +4,7 @@ import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -59,37 +60,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse<?>> handlingValidation(MethodArgumentNotValidException exception) {
-        String enumKey = exception.getFieldError().getDefaultMessage();
+        FieldError fieldError = exception.getBindingResult().getFieldError();
+        String message = fieldError.getDefaultMessage();
+        GlobalErrorCode errorCode = GlobalErrorCode.REQUEST_BODY_INVALID;
 
-        GlobalErrorCode globalErrorCode = GlobalErrorCode.UNCATEGORIZED_EXCEPTION;
+        ApiResponse<?> response = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(message)
+                .build();
 
-        Map<String, Object> attributes = null;
-        try {
-            globalErrorCode = GlobalErrorCode.valueOf(enumKey);
-
-            var constraintViolation =
-                    exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
-
-            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
-
-        } catch (IllegalArgumentException ignored) {
-
-        }
-
-        ApiResponse<?> apiResponse = new ApiResponse<>();
-
-        apiResponse.setCode(globalErrorCode.getCode());
-        apiResponse.setMessage(
-                Objects.nonNull(attributes)
-                        ? mapAttribute(globalErrorCode.getMessage(), attributes)
-                        : globalErrorCode.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
-    }
-
-    private String mapAttribute(String message, Map<String, Object> attributes) {
-        String minValue = String.valueOf(attributes.get(MIN_ATTRIBUTE));
-
-        return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+        return ResponseEntity.badRequest().body(response);
     }
 }

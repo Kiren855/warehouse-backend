@@ -12,6 +12,7 @@ public enum GlobalErrorCode implements BaseCodeError {
     UNCATEGORIZED_EXCEPTION(99999, "uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHENTICATED(99991, "unauthenticated", HttpStatus.UNAUTHORIZED),
     ENDPOINT_API_NOT_FOUND(99992, "endpoint API not found in system", HttpStatus.NOT_FOUND),
+    REQUEST_BODY_INVALID(99993, "request body invalid", HttpStatus.BAD_REQUEST)
     ;
 
     int code;

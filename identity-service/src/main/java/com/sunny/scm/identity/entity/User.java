@@ -23,16 +23,13 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     @Column(name = "user_id")
-    UUID userId;
+    String userId;
 
     @Column(name = "email",unique = true)
     String email;
 
-    @Column(name = "user name")
+    @Column(name = "username")
     String username;
-
-    @Column(name = "phone")
-    String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type")

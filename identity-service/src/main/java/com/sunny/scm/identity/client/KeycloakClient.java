@@ -4,28 +4,24 @@ import com.sunny.scm.identity.dto.param.RoleParam;
 import com.sunny.scm.identity.dto.param.TokenExchangeParam;
 import com.sunny.scm.identity.dto.request.UserCreationRequest;
 import com.sunny.scm.identity.dto.response.TokenExchangeResponse;
+import feign.Headers;
 import feign.QueryMap;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
 @FeignClient(name = "identity-client", url = "${keycloak.url}")
 public interface KeycloakClient {
-
     @PostMapping(
             value = "/realms/${keycloak.realm}/protocol/openid-connect/token",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
-    TokenExchangeResponse exchangeToken(
-            @QueryMap TokenExchangeParam tokenExchangeParam);
-
+    TokenExchangeResponse exchangeToken(@RequestBody MultiValueMap<String, String> formParams);
     @PostMapping(
             value = "/admin/realms/${keycloak.realm}/users",
             consumes = MediaType.APPLICATION_JSON_VALUE
@@ -53,13 +49,5 @@ public interface KeycloakClient {
             @QueryMap TokenExchangeParam param
     );
 
-    @PostMapping(
-            value = "/admin/realms/${keycloak.realm}/users/{userId}/role-mappings/realm",
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    void assignRealmRole(
-            @RequestHeader("authorization") String token,
-            @PathVariable("userId") String userId,
-            @RequestBody List<RoleParam> roles
-    );
+
 } 

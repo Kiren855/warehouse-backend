@@ -3,6 +3,7 @@ package com.sunny.scm.identity.controller;
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.identity.dto.request.RegisterRootRequest;
 import com.sunny.scm.identity.service.IdentityRootService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,7 +27,7 @@ public class IdentityRootController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<?>> register(@RequestBody RegisterRootRequest request) {
+    public ResponseEntity<ApiResponse<?>> register(@Valid @RequestBody RegisterRootRequest request) {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .message(identityRootService.register(request)).build();
 

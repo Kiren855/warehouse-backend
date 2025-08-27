@@ -23,9 +23,6 @@ public class Company extends BaseEntity {
     @Column(name = "tax_id", unique = true)
     String taxId;
 
-    @Column(name = "email", unique = true)
-    String email;
-
     @Column(name = "address", columnDefinition = "TEXT")
     String address;
 
