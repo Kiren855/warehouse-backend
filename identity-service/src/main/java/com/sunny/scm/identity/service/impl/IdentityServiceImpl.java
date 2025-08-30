@@ -1,8 +1,6 @@
 package com.sunny.scm.identity.service.impl;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.client.KeycloakClient;
@@ -11,23 +9,22 @@ import com.sunny.scm.identity.constant.IdentityErrorCode;
 import com.sunny.scm.identity.constant.RealmRoles;
 import com.sunny.scm.identity.dto.param.CredentialParam;
 import com.sunny.scm.identity.dto.param.RoleParam;
-import com.sunny.scm.identity.dto.param.TokenExchangeParam;
-import com.sunny.scm.identity.dto.request.LoginRootRequest;
-import com.sunny.scm.identity.dto.request.RegisterRootRequest;
-import com.sunny.scm.identity.dto.request.TokenRequest;
-import com.sunny.scm.identity.dto.request.UserCreationRequest;
+import com.sunny.scm.identity.dto.request.*;
 import com.sunny.scm.identity.entity.Company;
 import com.sunny.scm.identity.entity.User;
 import com.sunny.scm.identity.entity.UserType;
 import com.sunny.scm.identity.mapper.CompanyMapper;
 import com.sunny.scm.identity.repository.CompanyRepository;
 import com.sunny.scm.identity.repository.UserRepository;
-import com.sunny.scm.identity.service.IdentityRootService;
+import com.sunny.scm.identity.service.IdentityService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,7 +36,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IdentityRootServiceImpl implements IdentityRootService {
+public class IdentityServiceImpl implements IdentityService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
@@ -104,6 +101,61 @@ public class IdentityRootServiceImpl implements IdentityRootService {
             return "register successfully";
 
         } catch(FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    @Transactional
+    public String register(RegisterSubRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            String userId = authentication.getName();
+            String companyId = jwt.getClaimAsString("company_id");
+
+            var userCreationRequest = UserCreationRequest.builder()
+                    .username(request.getUsername())
+                    .emailVerified(true)
+                    .enabled(true)
+                    .attributes(Map.of("company_id", List.of(companyId)))
+                    .credentials(List.of(CredentialParam.builder()
+                            .type("password")
+                            .value(request.getPassword())
+                            .temporary(false)
+                            .build()))
+                    .build();
+            String clientToken = getClientToken();
+
+            var createUserResponse = keycloakClient.createUser(
+                    "Bearer " + clientToken,
+                    userCreationRequest
+            );
+
+            String subUserId = extractUserId(createUserResponse);
+            keycloakClient.assignRole(
+                    "Bearer " + clientToken,
+                    subUserId,
+                    List.of(RoleParam.builder()
+                            .id(RealmRoles.SUB.getId())
+                            .name(RealmRoles.SUB.getName())
+                            .build())
+            );
+
+            User newUser = User.builder()
+                    .userId(subUserId)
+                    .username(request.getUsername())
+                    .userType(UserType.SUB)
+                    .companyId(Long.valueOf(companyId))
+                    .isActive(true)
+                    .parentId(userId)
+                    .build();
+
+            userRepository.save(newUser);
+
+            return "register sub-user successfully";
+        } catch (FeignException e) {
             log.error(e.getMessage());
             throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
         }

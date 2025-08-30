@@ -22,7 +22,9 @@ import java.util.Collection;
 @EnableWebSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/root/auth/**",
+            "/auth/root/register",
+            "/auth/login",
+            "/exchange_token",
             "/internal/**"
     };
 

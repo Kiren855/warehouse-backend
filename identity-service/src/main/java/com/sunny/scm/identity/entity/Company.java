@@ -3,13 +3,15 @@ package com.sunny.scm.identity.entity;
 import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 @Builder
-@Entity(name = "companies")
+@Entity
+@Table(name = "companies")
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Company extends BaseEntity {

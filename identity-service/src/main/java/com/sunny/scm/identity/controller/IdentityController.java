@@ -4,22 +4,24 @@ import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.identity.constant.IdentitySuccessCode;
 import com.sunny.scm.identity.dto.request.LoginRootRequest;
 import com.sunny.scm.identity.dto.request.RegisterRootRequest;
+import com.sunny.scm.identity.dto.request.RegisterSubRequest;
 import com.sunny.scm.identity.dto.request.TokenRequest;
-import com.sunny.scm.identity.service.IdentityRootService;
+import com.sunny.scm.identity.service.IdentityService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/root/auth")
+@RequestMapping("/auth")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class IdentityRootController {
-    IdentityRootService identityRootService;
+public class IdentityController {
+    IdentityService identityRootService;
 
     @GetMapping("/hello")
     public ResponseEntity<ApiResponse<?>> hello() {
@@ -29,8 +31,17 @@ public class IdentityRootController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
-    @PostMapping("/register")
+    @PostMapping("root/register")
     public ResponseEntity<ApiResponse<?>> register(@Valid @RequestBody RegisterRootRequest request) {
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .message(identityRootService.register(request)).build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @PostMapping("sub/register")
+    @PreAuthorize("hasRole('ROOT')")
+    public ResponseEntity<ApiResponse<?>> register(@Valid @RequestBody RegisterSubRequest request) {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .message(identityRootService.register(request)).build();
 
