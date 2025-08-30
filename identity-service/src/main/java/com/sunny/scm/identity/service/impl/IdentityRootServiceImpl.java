@@ -1,11 +1,17 @@
 package com.sunny.scm.identity.service.impl;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.client.KeycloakClient;
 import com.sunny.scm.identity.constant.GrantType;
+import com.sunny.scm.identity.constant.IdentityErrorCode;
+import com.sunny.scm.identity.constant.RealmRoles;
 import com.sunny.scm.identity.dto.param.CredentialParam;
+import com.sunny.scm.identity.dto.param.RoleParam;
+import com.sunny.scm.identity.dto.param.TokenExchangeParam;
 import com.sunny.scm.identity.dto.request.LoginRootRequest;
 import com.sunny.scm.identity.dto.request.RegisterRootRequest;
 import com.sunny.scm.identity.dto.request.TokenRequest;
@@ -49,15 +55,14 @@ public class IdentityRootServiceImpl implements IdentityRootService {
     public String register(RegisterRootRequest request) {
         Company company = companyMapper.toEntity(request);
         companyRepository.save(company);
-
         try {
+            // create payload request
             var userCreationRequest = UserCreationRequest.builder()
                     .email(request.getEmail())
                     .username(request.getUsername())
                     .emailVerified(true)
                     .enabled(true)
                     .attributes(Map.of("company_id", List.of(company.getId().toString())))
-                    .realmRoles(Map.of())
                     .credentials(List.of(CredentialParam.builder()
                             .type("password")
                             .value(request.getPassword())
@@ -65,13 +70,26 @@ public class IdentityRootServiceImpl implements IdentityRootService {
                             .build()))
                     .build();
 
+            // get client token
             String clientToken = getClientToken();
+
+            //call keycloak api to create user
             var createUserResponse = keycloakClient.createUser(
                 "Bearer " + clientToken,
                 userCreationRequest
             );
 
             String userId = extractUserId(createUserResponse);
+            log.info("Flag");
+            keycloakClient.assignRole(
+                "Bearer " + clientToken,
+                userId,
+                List.of(RoleParam.builder()
+                        .id(RealmRoles.ROOT.getId())
+                        .name(RealmRoles.ROOT.getName())
+                        .build())
+            );
+
             User newUser = User.builder()
                     .userId(userId)
                     .username(request.getUsername())
@@ -94,18 +112,49 @@ public class IdentityRootServiceImpl implements IdentityRootService {
 
     @Override
     public Object login(LoginRootRequest request) {
-        return null;
+        try {
+            String clientToken = getClientToken();
+
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("grant_type", GrantType.PASSWORD.getValue());
+            form.add("client_id", clientId);
+            form.add("client_secret", clientSecret);
+            form.add("scope", "openid");
+            form.add("username", request.getUsername());
+            form.add("password", request.getPassword());
+
+            var loginResponse = keycloakClient.login(
+                    clientToken, form).getBody();
+
+            return loginResponse;
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS);
+        }
     }
 
     @Override
     public Object refreshToken(TokenRequest request) {
-        return null;
+        try {
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("grant_type", GrantType.PASSWORD.getValue());
+            form.add("client_id", clientId);
+            form.add("client_secret", clientSecret);
+            form.add("scope", "openid");
+            form.add("refresh_token", request.getRefreshToken());
+
+            return keycloakClient.exchangeToken(form);
+
+        } catch (FeignException e) {
+            log.info(e.getMessage());
+            throw  new AppException(IdentityErrorCode.REFRESH_TOKEN_ERROR);
+        }
     }
 
     private String extractUserId(ResponseEntity<?> response) {
         String location = response.getHeaders().get("Location").getFirst();
-        String[] splitedStr = location.split("/");
-        return splitedStr[splitedStr.length - 1];
+        String[] splitStr = location.split("/");
+        return splitStr[splitStr.length - 1];
     }
 
     private String getClientToken() {

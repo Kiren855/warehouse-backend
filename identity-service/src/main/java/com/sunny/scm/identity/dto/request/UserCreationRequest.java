@@ -21,5 +21,4 @@ public class UserCreationRequest {
     boolean enabled;
     List<CredentialParam> credentials;
     Map<String, List<String>> attributes;
-    Map<String, List<String>> realmRoles;
 }

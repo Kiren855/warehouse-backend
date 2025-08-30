@@ -1,7 +1,10 @@
 package com.sunny.scm.identity.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
+import com.sunny.scm.identity.constant.IdentitySuccessCode;
+import com.sunny.scm.identity.dto.request.LoginRootRequest;
 import com.sunny.scm.identity.dto.request.RegisterRootRequest;
+import com.sunny.scm.identity.dto.request.TokenRequest;
 import com.sunny.scm.identity.service.IdentityRootService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -32,5 +35,23 @@ public class IdentityRootController {
                 .message(identityRootService.register(request)).build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRootRequest request) {
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .message(IdentitySuccessCode.LOGIN_SUCCESS.getMessage())
+                .result(identityRootService.login(request)).build();
+
+        return ResponseEntity.status(IdentitySuccessCode.LOGIN_SUCCESS.getHttpStatus()).body(apiResponse);
+    }
+
+    @PostMapping("/exchange_token")
+    public ResponseEntity<?> exchangeToken(@RequestBody TokenRequest request) {
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .message(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getMessage())
+                .result(identityRootService.refreshToken(request)).build();
+
+        return ResponseEntity.status(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getHttpStatus()).body(apiResponse);
     }
 }

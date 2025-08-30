@@ -11,18 +11,18 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TokenExchangeParam {
     @JsonProperty("grant_type")
-    String grantType;
+    String grant_type;
 
     @JsonProperty("client_id")
     String client_id;
 
     @JsonProperty("client_secret")
-    String clientSecret;
+    String client_secret;
 
     String scope;
     String username;
     String password;
 
     @JsonProperty("refresh_token")
-    String refreshToken;
+    String refresh_token;
 }
