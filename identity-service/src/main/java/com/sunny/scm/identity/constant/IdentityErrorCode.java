@@ -24,6 +24,7 @@ public  enum IdentityErrorCode implements BaseCodeError {
     COMPANY_PHONE_REQUIRED(10013, "COMPANY_PHONE_REQUIRED", HttpStatus.BAD_REQUEST),
     EMAIL_INVALID(10014, "EMAIL_INVALID", HttpStatus.BAD_REQUEST),
     EMAIL_REQUIRED(10015, "EMAIL_REQUIRED", HttpStatus.BAD_REQUEST),
+    ACCOUNT_NOT_EXISTS(10016, "account not exist", HttpStatus.BAD_REQUEST)
     ;
 
     int code;

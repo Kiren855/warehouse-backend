@@ -3,6 +3,7 @@ package com.sunny.scm.common.exception;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.ApiResponse;
 import jakarta.validation.ConstraintViolation;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<?>> handlingAccessDeniedException(AccessDeniedException exception) {
         GlobalErrorCode globalErrorCode = GlobalErrorCode.UNCATEGORIZED_EXCEPTION;
 
-        return ResponseEntity.status(globalErrorCode.getCode())
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.builder()
                         .code(globalErrorCode.getCode())
                         .message(globalErrorCode.getMessage())
