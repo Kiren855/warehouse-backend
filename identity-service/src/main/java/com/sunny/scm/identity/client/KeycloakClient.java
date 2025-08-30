@@ -45,7 +45,7 @@ public interface KeycloakClient {
             value = "/realms/${keycloak.realm}/protocol/openid-connect/token",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
-    ResponseEntity<?> login(
+    TokenExchangeResponse login(
             @RequestHeader("authorization") String token,
             @RequestBody MultiValueMap<String, String> formParams
     );

@@ -80,7 +80,6 @@ public class IdentityRootServiceImpl implements IdentityRootService {
             );
 
             String userId = extractUserId(createUserResponse);
-            log.info("Flag");
             keycloakClient.assignRole(
                 "Bearer " + clientToken,
                 userId,
@@ -113,6 +112,10 @@ public class IdentityRootServiceImpl implements IdentityRootService {
     @Override
     public Object login(LoginRootRequest request) {
         try {
+            String loginId = request.getUsername() != null && !request.getUsername().isBlank()
+                    ? request.getUsername()
+                    : request.getEmail();
+
             String clientToken = getClientToken();
 
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -120,11 +123,11 @@ public class IdentityRootServiceImpl implements IdentityRootService {
             form.add("client_id", clientId);
             form.add("client_secret", clientSecret);
             form.add("scope", "openid");
-            form.add("username", request.getUsername());
+            form.add("username", loginId);
             form.add("password", request.getPassword());
 
             var loginResponse = keycloakClient.login(
-                    clientToken, form).getBody();
+                    clientToken, form);
 
             return loginResponse;
         } catch (FeignException e) {
@@ -137,10 +140,9 @@ public class IdentityRootServiceImpl implements IdentityRootService {
     public Object refreshToken(TokenRequest request) {
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-            form.add("grant_type", GrantType.PASSWORD.getValue());
+            form.add("grant_type", GrantType.REFRESH_TOKEN.getValue());
             form.add("client_id", clientId);
             form.add("client_secret", clientSecret);
-            form.add("scope", "openid");
             form.add("refresh_token", request.getRefreshToken());
 
             return keycloakClient.exchangeToken(form);

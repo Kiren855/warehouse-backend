@@ -1,0 +1,130 @@
+package com.sunny.scm.identity.service.impl;
+
+import com.sunny.scm.common.constant.GlobalErrorCode;
+import com.sunny.scm.common.dto.CustomPrincipal;
+import com.sunny.scm.common.exception.AppException;
+import com.sunny.scm.identity.client.KeycloakClient;
+import com.sunny.scm.identity.constant.GrantType;
+import com.sunny.scm.identity.constant.IdentityErrorCode;
+import com.sunny.scm.identity.constant.RealmRoles;
+import com.sunny.scm.identity.dto.param.CredentialParam;
+import com.sunny.scm.identity.dto.param.RoleParam;
+import com.sunny.scm.identity.dto.request.LoginSubRequest;
+import com.sunny.scm.identity.dto.request.RegisterSubRequest;
+import com.sunny.scm.identity.dto.request.TokenRequest;
+import com.sunny.scm.identity.dto.request.UserCreationRequest;
+import com.sunny.scm.identity.entity.User;
+import com.sunny.scm.identity.entity.UserType;
+import com.sunny.scm.identity.repository.UserRepository;
+import com.sunny.scm.identity.service.IdentitySubService;
+import feign.FeignException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class IdentitySubServiceImpl implements IdentitySubService {
+
+    private final UserRepository userRepository;
+    private final KeycloakClient keycloakClient;
+
+    @Value("${keycloak.client-id}")
+    String clientId;
+
+    @Value("${keycloak.client-secret}")
+    String clientSecret;
+    @Override
+    @Transactional
+    public String register(RegisterSubRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            String userId = authentication.getName();
+            String companyId = jwt.getClaimAsString("company_id");
+
+            var userCreationRequest = UserCreationRequest.builder()
+                    .username(request.getUsername())
+                    .emailVerified(true)
+                    .enabled(true)
+                    .attributes(Map.of("company_id", List.of(companyId)))
+                    .credentials(List.of(CredentialParam.builder()
+                            .type("password")
+                            .value(request.getPassword())
+                            .temporary(false)
+                            .build()))
+                    .build();
+            String clientToken = getClientToken();
+
+            var createUserResponse = keycloakClient.createUser(
+                    "Bearer " + clientToken,
+                    userCreationRequest
+            );
+
+            String subUserId = extractUserId(createUserResponse);
+            keycloakClient.assignRole(
+                    "Bearer " + clientToken,
+                    subUserId,
+                    List.of(RoleParam.builder()
+                            .id(RealmRoles.SUB.getId())
+                            .name(RealmRoles.SUB.getName())
+                            .build())
+            );
+
+            User newUser = User.builder()
+                    .userId(subUserId)
+                    .username(request.getUsername())
+                    .userType(UserType.SUB)
+                    .companyId(Long.valueOf(companyId))
+                    .isActive(true)
+                    .parentId(userId)
+                    .build();
+
+            userRepository.save(newUser);
+
+            return "register sub-user successfully";
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    public Object login(LoginSubRequest request) {
+        return null;
+    }
+
+    @Override
+    public Object refreshToken(TokenRequest request) {
+        return null;
+    }
+
+    private String getClientToken() {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type", GrantType.CLIENT_CREDENTIALS.getValue());
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        form.add("scope", "openid");
+
+        var clientToken = keycloakClient.exchangeToken(form);
+        return clientToken.getAccessToken();
+    }
+
+    private String extractUserId(ResponseEntity<?> response) {
+        String location = response.getHeaders().get("Location").getFirst();
+        String[] splitStr = location.split("/");
+        return splitStr[splitStr.length - 1];
+    }
+}

@@ -9,7 +9,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum GrantType {
     CLIENT_CREDENTIALS("client_credentials"),
-    PASSWORD("password")
+    PASSWORD("password"),
+    REFRESH_TOKEN("refresh_token")
     ;
     String value;
 

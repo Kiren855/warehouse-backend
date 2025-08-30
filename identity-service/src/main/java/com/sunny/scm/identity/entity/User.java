@@ -36,7 +36,7 @@ public class User extends BaseEntity {
     UserType userType;
 
     @Column(name = "parent_id")
-    Long parentId;
+    String parentId;
 
     @Column(name = "is_active")
     boolean isActive;
