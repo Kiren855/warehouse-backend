@@ -4,11 +4,11 @@ import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "companies")
@@ -16,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Company extends BaseEntity {
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "name", unique = true)
     String name;
 
     @Column(name = "legal_name")

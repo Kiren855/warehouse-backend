@@ -1,9 +1,9 @@
 package com.sunny.scm.identity.client;
 
-import com.sunny.scm.identity.dto.param.RoleParam;
-import com.sunny.scm.identity.dto.param.TokenExchangeParam;
-import com.sunny.scm.identity.dto.request.UserCreationRequest;
-import com.sunny.scm.identity.dto.response.TokenExchangeResponse;
+import com.sunny.scm.identity.dto.auth.RoleParam;
+import com.sunny.scm.identity.dto.auth.TokenExchangeParam;
+import com.sunny.scm.identity.dto.auth.UserCreationRequest;
+import com.sunny.scm.identity.dto.auth.TokenExchangeResponse;
 import feign.QueryMap;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

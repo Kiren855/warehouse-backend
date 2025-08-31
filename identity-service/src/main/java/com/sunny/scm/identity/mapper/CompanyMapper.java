@@ -1,8 +1,7 @@
 package com.sunny.scm.identity.mapper;
 
 
-import com.sunny.scm.identity.dto.request.RegisterRootRequest;
-import com.sunny.scm.identity.dto.response.CompanyResponse;
+import com.sunny.scm.identity.dto.auth.RegisterRootRequest;
 import com.sunny.scm.identity.entity.Company;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

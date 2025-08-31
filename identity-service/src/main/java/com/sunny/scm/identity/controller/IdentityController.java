@@ -2,10 +2,10 @@ package com.sunny.scm.identity.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.identity.constant.IdentitySuccessCode;
-import com.sunny.scm.identity.dto.request.LoginRootRequest;
-import com.sunny.scm.identity.dto.request.RegisterRootRequest;
-import com.sunny.scm.identity.dto.request.RegisterSubRequest;
-import com.sunny.scm.identity.dto.request.TokenRequest;
+import com.sunny.scm.identity.dto.auth.LoginRootRequest;
+import com.sunny.scm.identity.dto.auth.RegisterRootRequest;
+import com.sunny.scm.identity.dto.auth.RegisterSubRequest;
+import com.sunny.scm.identity.dto.auth.TokenRequest;
 import com.sunny.scm.identity.service.IdentityService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

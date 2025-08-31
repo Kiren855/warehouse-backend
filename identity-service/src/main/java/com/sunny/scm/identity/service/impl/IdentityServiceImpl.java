@@ -7,9 +7,7 @@ import com.sunny.scm.identity.client.KeycloakClient;
 import com.sunny.scm.identity.constant.GrantType;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
 import com.sunny.scm.identity.constant.RealmRoles;
-import com.sunny.scm.identity.dto.param.CredentialParam;
-import com.sunny.scm.identity.dto.param.RoleParam;
-import com.sunny.scm.identity.dto.request.*;
+import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
 import com.sunny.scm.identity.entity.User;
 import com.sunny.scm.identity.entity.UserType;
@@ -50,7 +48,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     @Transactional
     public String register(RegisterRootRequest request) {
-        Company company = companyMapper.toEntity(request);
+        Company company = new Company();
         companyRepository.save(company);
         try {
             // create payload request

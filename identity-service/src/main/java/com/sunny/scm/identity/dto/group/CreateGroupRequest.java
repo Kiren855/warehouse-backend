@@ -1,14 +1,11 @@
-package com.sunny.scm.identity.dto.param;
+package com.sunny.scm.identity.dto.group;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-@Builder
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoleParam {
-    String id;
-    String name;
+public class CreateGroupRequest {
+
 }

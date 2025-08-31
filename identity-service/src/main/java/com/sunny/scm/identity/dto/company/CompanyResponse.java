@@ -1,4 +1,4 @@
-package com.sunny.scm.identity.dto.response;
+package com.sunny.scm.identity.dto.company;
 
 
 import jakarta.persistence.Column;

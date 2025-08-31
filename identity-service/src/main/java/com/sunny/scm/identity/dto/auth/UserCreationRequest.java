@@ -1,8 +1,7 @@
-package com.sunny.scm.identity.dto.request;
+package com.sunny.scm.identity.dto.auth;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sunny.scm.identity.dto.param.CredentialParam;
+import com.sunny.scm.identity.dto.auth.CredentialParam;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

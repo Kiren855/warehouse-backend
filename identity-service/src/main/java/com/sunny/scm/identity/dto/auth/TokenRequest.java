@@ -1,4 +1,4 @@
-package com.sunny.scm.identity.dto.request;
+package com.sunny.scm.identity.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
