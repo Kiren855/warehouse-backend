@@ -23,7 +23,10 @@ public  enum IdentityErrorCode implements BaseCodeError {
     EMAIL_INVALID("E10014", "EMAIL_INVALID", HttpStatus.BAD_REQUEST),
     EMAIL_REQUIRED("E10015", "EMAIL_REQUIRED", HttpStatus.BAD_REQUEST),
     ACCOUNT_NOT_EXISTS("E10016", "account not exist", HttpStatus.BAD_REQUEST),
-    REFRESH_TOKEN_ERROR("E10017", "refresh token error", HttpStatus.BAD_REQUEST)
+    REFRESH_TOKEN_ERROR("E10017", "refresh token error", HttpStatus.BAD_REQUEST),
+    USER_NOT_EXISTS("E10018", "user not exists in system", HttpStatus.BAD_REQUEST),
+    COMPANY_NOT_EXISTS("E10019", "company not exists in system", HttpStatus.BAD_REQUEST),
+    GROUP_NOT_EXISTS("E10020", "group not exists in system", HttpStatus.BAD_REQUEST)
     ;
 
     String code;

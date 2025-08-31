@@ -34,5 +34,4 @@ public class UpdateCompanyRequest {
     @Size(min = 8, max = 20, message = "COMPANY_PHONE_INVALID")
     @NotBlank(message = "COMPANY_PHONE_REQUIRED")
     String companyPhone;
-
 }

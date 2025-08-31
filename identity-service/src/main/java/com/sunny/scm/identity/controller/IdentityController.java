@@ -18,10 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth")
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequestMapping("/api/v1/auth")
 public class IdentityController {
-    IdentityService identityRootService;
+    private final IdentityService identityRootService;
 
     @GetMapping("/hello")
     public ResponseEntity<ApiResponse<?>> hello() {
