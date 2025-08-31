@@ -11,7 +11,6 @@ import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
 import com.sunny.scm.identity.entity.User;
 import com.sunny.scm.identity.entity.UserType;
-import com.sunny.scm.identity.mapper.CompanyMapper;
 import com.sunny.scm.identity.repository.CompanyRepository;
 import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.IdentityService;
@@ -37,7 +36,6 @@ import java.util.Map;
 public class IdentityServiceImpl implements IdentityService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
-    private final CompanyMapper companyMapper;
     private final KeycloakClient keycloakClient;
 
     @Value("${keycloak.client-id}")
@@ -176,10 +174,8 @@ public class IdentityServiceImpl implements IdentityService {
             form.add("username", loginId);
             form.add("password", request.getPassword());
 
-            var loginResponse = keycloakClient.login(
-                    clientToken, form);
+            return keycloakClient.login(clientToken, form);
 
-            return loginResponse;
         } catch (FeignException e) {
             log.error(e.getMessage());
             throw new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS);
@@ -187,19 +183,37 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public TokenExchangeResponse refreshToken(TokenRequest request) {
+    public TokenExchangeResponse refreshToken(String token) {
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("grant_type", GrantType.REFRESH_TOKEN.getValue());
             form.add("client_id", clientId);
             form.add("client_secret", clientSecret);
-            form.add("refresh_token", request.getRefreshToken());
+            form.add("refresh_token", token);
 
             return keycloakClient.exchangeToken(form);
 
         } catch (FeignException e) {
             log.info(e.getMessage());
             throw  new AppException(IdentityErrorCode.REFRESH_TOKEN_ERROR);
+        }
+    }
+
+    @Override
+    public void logout(String token) {
+        try {
+            String clientToken = getClientToken();
+
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("client_id", clientId);
+            form.add("client_secret", clientSecret);
+            form.add("refresh_token", token);
+
+            keycloakClient.logout(clientToken, form);
+
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(IdentityErrorCode.LOGOUT_ERROR);
         }
     }
 

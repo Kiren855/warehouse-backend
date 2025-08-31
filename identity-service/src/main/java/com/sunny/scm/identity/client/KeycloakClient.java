@@ -52,11 +52,11 @@ public interface KeycloakClient {
 
 
     @PostMapping(
-            value = "/realms/${keycloak.realm/protocol/openid-connect/logout",
+            value = "/realms/${keycloak.realm}/protocol/openid-connect/logout",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     void logout(
             @RequestHeader("authorization") String token,
-            @QueryMap TokenExchangeParam param
+            @RequestBody MultiValueMap<String, String> formParams
     );
 
 

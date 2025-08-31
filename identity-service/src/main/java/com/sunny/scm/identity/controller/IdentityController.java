@@ -4,12 +4,9 @@ import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.identity.constant.IdentitySuccessCode;
 import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.service.IdentityService;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -22,6 +19,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/auth")
+@SuppressWarnings("unused")
 public class IdentityController {
     private final IdentityService identityRootService;
 
@@ -66,6 +64,7 @@ public class IdentityController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(IdentitySuccessCode.LOGIN_SUCCESS.getCode())
                 .message(IdentitySuccessCode.LOGIN_SUCCESS.getMessage())
                 .result(TokenExchangeResponse.builder()
                         .accessToken(tokenResponse.getAccessToken())
@@ -80,8 +79,10 @@ public class IdentityController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> exchangeToken(@RequestBody TokenRequest request) {
-        TokenExchangeResponse tokenResponse = identityRootService.refreshToken(request);
+    public ResponseEntity<?> exchangeToken(@CookieValue(name = "refresh_token") String refreshToken,
+     HttpServletResponse response)
+     {
+        TokenExchangeResponse tokenResponse = identityRootService.refreshToken(refreshToken);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", tokenResponse.getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
@@ -90,7 +91,10 @@ public class IdentityController {
                 .sameSite("Strict")
                 .build();
 
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
         ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getCode())
                 .message(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getMessage())
                 .result(TokenExchangeResponse.builder()
                         .accessToken(tokenResponse.getAccessToken())
@@ -104,5 +108,28 @@ public class IdentityController {
         .body(apiResponse);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@CookieValue(name = "refresh_token") String refreshToken,
+        HttpServletResponse response)
+    {
+        identityRootService.logout(refreshToken);
+
+        ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(IdentitySuccessCode.LOGOUT_SUCCESS.getCode())
+                .message(IdentitySuccessCode.LOGOUT_SUCCESS.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
 
 }

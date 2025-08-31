@@ -8,5 +8,6 @@ public interface IdentityService {
     String register(RegisterRootRequest request);
     String register(RegisterSubRequest request);
     TokenExchangeResponse login(LoginRootRequest request);
-    TokenExchangeResponse refreshToken(TokenRequest request);
+    TokenExchangeResponse refreshToken(String token);
+    void logout(String token);
 }
