@@ -17,12 +17,5 @@ public interface CompanyMapper {
     @Mapping(source = "taxId", target = "taxId")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "companyPhone", target = "phone")
-    Company toEntity(RegisterRootRequest request);
-
-    @Mapping(source = "companyName", target = "name")
-    @Mapping(source = "legalName", target = "legalName")
-    @Mapping(source = "taxId", target = "taxId")
-    @Mapping(source = "address", target = "address")
-    @Mapping(source = "companyPhone", target = "phone")
     void updateEntityFromDto(UpdateCompanyRequest request, @MappingTarget Company company);
 }

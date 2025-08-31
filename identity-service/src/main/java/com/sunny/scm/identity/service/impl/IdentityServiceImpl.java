@@ -160,7 +160,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public Object login(LoginRootRequest request) {
+    public TokenExchangeResponse login(LoginRootRequest request) {
         try {
             String loginId = request.getUsername() != null && !request.getUsername().isBlank()
                     ? request.getUsername()
@@ -187,7 +187,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public Object refreshToken(TokenRequest request) {
+    public TokenExchangeResponse refreshToken(TokenRequest request) {
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("grant_type", GrantType.REFRESH_TOKEN.getValue());

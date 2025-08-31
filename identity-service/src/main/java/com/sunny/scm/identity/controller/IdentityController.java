@@ -2,19 +2,22 @@ package com.sunny.scm.identity.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.identity.constant.IdentitySuccessCode;
-import com.sunny.scm.identity.dto.auth.LoginRootRequest;
-import com.sunny.scm.identity.dto.auth.RegisterRootRequest;
-import com.sunny.scm.identity.dto.auth.RegisterSubRequest;
-import com.sunny.scm.identity.dto.auth.TokenRequest;
+import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.service.IdentityService;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RequiredArgsConstructor
 @RestController
@@ -48,20 +51,58 @@ public class IdentityController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRootRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRootRequest request,
+                                   HttpServletResponse response) {
+        TokenExchangeResponse tokenResponse = identityRootService.login(request);
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", tokenResponse.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .message(IdentitySuccessCode.LOGIN_SUCCESS.getMessage())
-                .result(identityRootService.login(request)).build();
+                .result(TokenExchangeResponse.builder()
+                        .accessToken(tokenResponse.getAccessToken())
+                        .expiresIn(tokenResponse.getExpiresIn())
+                        .tokenType(tokenResponse.getTokenType())
+                        .build())
+                .build();
 
-        return ResponseEntity.status(IdentitySuccessCode.LOGIN_SUCCESS.getHttpStatus()).body(apiResponse);
+        return ResponseEntity
+        .status(IdentitySuccessCode.LOGIN_SUCCESS.getHttpStatus())
+        .body(apiResponse);
     }
 
-    @PostMapping("/exchange_token")
+    @PostMapping("/refresh")
     public ResponseEntity<?> exchangeToken(@RequestBody TokenRequest request) {
+        TokenExchangeResponse tokenResponse = identityRootService.refreshToken(request);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", tokenResponse.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .message(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getMessage())
-                .result(identityRootService.refreshToken(request)).build();
+                .result(TokenExchangeResponse.builder()
+                        .accessToken(tokenResponse.getAccessToken())
+                        .tokenType(tokenResponse.getTokenType())
+                        .expiresIn(tokenResponse.getExpiresIn())
+                        .build())
+                .build();
 
-        return ResponseEntity.status(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getHttpStatus()).body(apiResponse);
+        return ResponseEntity
+        .status(IdentitySuccessCode.REFRESH_TOKEN_SUCCESS.getHttpStatus())
+        .body(apiResponse);
     }
+
+
 }

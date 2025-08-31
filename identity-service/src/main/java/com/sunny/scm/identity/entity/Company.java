@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Table(name = "companies")
 @Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Company extends BaseEntity {
 
