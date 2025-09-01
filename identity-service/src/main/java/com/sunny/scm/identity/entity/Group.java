@@ -39,9 +39,17 @@ public class Group extends BaseEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "group_user",
+            name = "group_users",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> users;
+    Set<User> users;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "group_roles",
+        joinColumns = @JoinColumn(name = "group_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    Set<Role> roles;
 }

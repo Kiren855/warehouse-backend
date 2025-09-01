@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateGroupRequest {
@@ -14,4 +16,7 @@ public class CreateGroupRequest {
     @NotBlank(message = "Group name must not be blank")
     @JsonProperty("group_name")
     String groupName;
+
+    @JsonProperty("roles")
+    List<RoleDto> roles;
 }

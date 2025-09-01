@@ -4,7 +4,9 @@ import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
 import com.sunny.scm.identity.dto.group.CreateGroupRequest;
 import com.sunny.scm.identity.entity.Group;
+import com.sunny.scm.identity.entity.Role;
 import com.sunny.scm.identity.repository.GroupRepository;
+import com.sunny.scm.identity.repository.RoleRepository;
 import com.sunny.scm.identity.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +16,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
+    private final RoleRepository roleRepository;
     @Override
     public void createGroup(CreateGroupRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -36,6 +41,13 @@ public class GroupServiceImpl implements GroupService {
                     .groupName(request.getGroupName())
                     .companyId(Long.valueOf(companyId))
                     .createdBy(userId).build();
+
+            Set<Role> roles = request.getRoles().stream().map(
+                    role -> roleRepository.findByIdAndIsActiveTrue(role.getId())
+                            .orElseThrow(() -> new AppException(IdentityErrorCode.ROLE_NOT_FOUND))
+            ).collect(java.util.stream.Collectors.toSet());
+
+            group.getRoles().addAll(roles);
 
             groupRepository.save(group);
         } catch (DataIntegrityViolationException e) {
