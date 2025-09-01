@@ -1,7 +1,9 @@
 package com.sunny.scm.identity.entity;
 
+import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,27 +11,22 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "groups",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"company_id", "group_name"})
-})
+            @UniqueConstraint(columnNames = {"company_id", "group_name"}),
+        },
+        indexes = {
+            @Index(name = "idx_group_name", columnList = "group_name"),
+            @Index(name = "idx_group_company_id", columnList = "company_id")
+        })
 @Getter
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Group implements Serializable {
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime creationTimestamp;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updateTimestamp;
+public class Group extends BaseEntity {
 
     @Column(name = "company_id")
     Long companyId;
@@ -39,4 +36,12 @@ public class Group implements Serializable {
 
     @Column(name = "create_by")
     String createdBy;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "group_user",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users;
 }

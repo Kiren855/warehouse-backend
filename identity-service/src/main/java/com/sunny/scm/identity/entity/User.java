@@ -1,6 +1,7 @@
 package com.sunny.scm.identity.entity;
 
 
+import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -22,19 +24,7 @@ import java.time.LocalDateTime;
             @UniqueConstraint(columnNames = {"company_id", "username"})
         }
 )
-public class User implements Serializable {
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime creationTimestamp;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updateTimestamp;
+public class User extends BaseEntity {
 
     @Column(name = "user_id")
     String userId;
@@ -57,4 +47,7 @@ public class User implements Serializable {
 
     @Column(name = "company_id")
     Long companyId;
+
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    Set<Group> groups;
 }

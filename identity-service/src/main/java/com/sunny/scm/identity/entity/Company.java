@@ -1,5 +1,6 @@
 package com.sunny.scm.identity.entity;
 
+import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,19 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Company implements Serializable {
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime creationTimestamp;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updateTimestamp;
+public class Company extends BaseEntity {
 
     @Column(name = "name", unique = true)
     String name;
