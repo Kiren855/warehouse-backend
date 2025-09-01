@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Group implements Serializable {
-
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
