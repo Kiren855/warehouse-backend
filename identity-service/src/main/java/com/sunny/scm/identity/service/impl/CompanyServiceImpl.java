@@ -30,6 +30,16 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyRepository.findById(Long.valueOf(companyId))
                 .orElseThrow(() -> new AppException(IdentityErrorCode.COMPANY_NOT_EXISTS));
 
+        companyRepository.findByName(request.getCompanyName())
+                        .ifPresent( entity -> {
+                           throw new AppException(IdentityErrorCode.COMPANY_NAME_ALREADY_EXISTS);
+                        });
+
+        companyRepository.findByTaxId(request.getTaxId())
+                        .ifPresent( entity -> {
+                           throw new AppException(IdentityErrorCode.COMPANY_TAX_ID_ALREADY_EXISTS);
+                        });
+
         companyMapper.updateEntityFromDto(request, company);
         companyRepository.save(company);
     }

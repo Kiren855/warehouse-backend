@@ -18,7 +18,7 @@ import java.time.Duration;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/identity/api/v1/auth")
 @SuppressWarnings("unused")
 public class IdentityController {
     private final IdentityService identityRootService;

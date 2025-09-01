@@ -29,7 +29,12 @@ public  enum IdentityErrorCode implements BaseCodeError {
     GROUP_NOT_EXISTS("E10020", "group not exists in system", HttpStatus.BAD_REQUEST),
     LOGOUT_ERROR("E10021", "logout error", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIAL("E10022", "invalid credential", HttpStatus.BAD_REQUEST),
-    USERNAME_EXISTS("E10023", "username already exists", HttpStatus.BAD_REQUEST);
+    USERNAME_EXISTS("E10023", "username already exists", HttpStatus.BAD_REQUEST),
+    USERNAME_ALREADY_EXISTS("E10024", "username already exists", HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_EXISTS("E10025", "email already exists", HttpStatus.BAD_REQUEST),
+    ACCOUNT_ALREADY_EXISTS("E10026", "account already exists", HttpStatus.BAD_REQUEST),
+    COMPANY_NAME_ALREADY_EXISTS("E10027", "company name already exists", HttpStatus.BAD_REQUEST),
+    COMPANY_TAX_ID_ALREADY_EXISTS("E10028", "company tax id already exists", HttpStatus.BAD_REQUEST),;
 
     String code;
     String message;

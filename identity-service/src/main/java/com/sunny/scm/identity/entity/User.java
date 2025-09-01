@@ -1,16 +1,18 @@
 package com.sunny.scm.identity.entity;
 
 
-import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.UUID;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -20,7 +22,19 @@ import java.util.UUID;
             @UniqueConstraint(columnNames = {"company_id", "username"})
         }
 )
-public class User extends BaseEntity {
+public class User implements Serializable {
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime creationTimestamp;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updateTimestamp;
 
     @Column(name = "user_id")
     String userId;

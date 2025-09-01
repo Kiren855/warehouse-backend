@@ -44,15 +44,20 @@ public class IdentityServiceImpl implements IdentityService {
     @Value("${keycloak.client-secret}")
     String clientSecret;
     @Override
-    @Transactional
     public String register(RegisterRootRequest request) {
+
+        userRepository.findByEmail(request.getEmail())
+                .ifPresent(user -> {
+                    throw new AppException(IdentityErrorCode.ACCOUNT_ALREADY_EXISTS);
+                });
+
         Company company = new Company();
         companyRepository.save(company);
         try {
             // create payload request
             var userCreationRequest = UserCreationRequest.builder()
                     .email(request.getEmail())
-                    .username(request.getUsername())
+                    .username(request.getEmail())
                     .emailVerified(true)
                     .enabled(true)
                     .attributes(Map.of("company_id", List.of(company.getId().toString())))
@@ -84,7 +89,6 @@ public class IdentityServiceImpl implements IdentityService {
 
             User newUser = User.builder()
                     .userId(userId)
-                    .username(request.getUsername())
                     .email(request.getEmail())
                     .userType(UserType.ROOT)
                     .companyId(company.getId())

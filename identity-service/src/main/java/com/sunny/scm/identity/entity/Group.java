@@ -1,13 +1,14 @@
 package com.sunny.scm.identity.entity;
 
-import com.sunny.scm.common.base.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "groups",
@@ -16,7 +17,21 @@ import lombok.experimental.FieldDefaults;
 })
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Group extends BaseEntity {
+public class Group implements Serializable {
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime creationTimestamp;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updateTimestamp;
+
     @Column(name = "company_id")
     Long companyId;
 

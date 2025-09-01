@@ -18,11 +18,6 @@ public class RegisterRootRequest {
     @NotBlank(message = "EMAIL_REQUIRED")
     String email;
 
-    @JsonProperty("username")
-    @NotBlank(message = "USERNAME_REQUIRED")
-    @Size(min = 6, max = 50, message = "USERNAME INVALID")
-    String username;
-
     @JsonProperty("password")
     @NotBlank(message = "PASSWORD_REQUIRED")
     @Size(min = 8, max = 50, message = "PASSWORD_INVALID")
