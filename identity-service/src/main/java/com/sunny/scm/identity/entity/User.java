@@ -23,20 +23,20 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     @Column(name = "user_id")
-    UUID userId;
+    String userId;
 
-    @Column(unique = true)
+    @Column(name = "email",unique = true)
     String email;
 
+    @Column(name = "username")
     String username;
-    String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type")
     UserType userType;
 
     @Column(name = "parent_id")
-    Long parentId;
+    String parentId;
 
     @Column(name = "is_active")
     boolean isActive;

@@ -3,17 +3,21 @@ package com.sunny.scm.identity.entity;
 import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.persistence.Table;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Entity(name = "companies")
+@Entity
+@Table(name = "companies")
 @Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Company extends BaseEntity {
-    @Column(unique = true, nullable = false)
+
+    @Column(name = "name", unique = true)
     String name;
 
     @Column(name = "legal_name")
@@ -22,11 +26,9 @@ public class Company extends BaseEntity {
     @Column(name = "tax_id", unique = true)
     String taxId;
 
-    @Column(unique = true)
-    String email;
-
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "address", columnDefinition = "TEXT")
     String address;
 
+    @Column(name = "phone")
     String phone;
 }
