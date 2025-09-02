@@ -8,10 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/identity/api/v1/groups")
@@ -30,5 +27,18 @@ public class GroupController {
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
                 .build());
+    }
+
+    @PostMapping("/{groupId}/users/{userId}")
+    public ResponseEntity<?> addUserInGroup(@PathVariable Long groupId, @PathVariable String userId) {
+        groupService.addUserInGroup(groupId, userId);
+        IdentitySuccessCode successCode = IdentitySuccessCode.USER_ADD_IN_GROUP_SUCCESS;
+
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .build());
+
     }
 }
