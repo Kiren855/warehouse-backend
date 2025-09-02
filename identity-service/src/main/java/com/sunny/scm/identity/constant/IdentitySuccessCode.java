@@ -14,7 +14,8 @@ public enum IdentitySuccessCode implements BaseCodeError {
     REFRESH_TOKEN_SUCCESS("S10003", "refresh token successfully", HttpStatus.OK),
     LOGOUT_SUCCESS("S10004", "logout successfully", HttpStatus.OK),
     COMPANY_CREATE_SUCCESS("S10005", "create company successfully", HttpStatus.CREATED),
-    COMPANY_UPDATE_SUCCESS("S10006", "update company successfully", HttpStatus.OK),;
+    COMPANY_UPDATE_SUCCESS("S10006", "update company successfully", HttpStatus.OK),
+    GROUP_CREATE_SUCCESS("S10007", "create group successfully", HttpStatus.CREATED),;
     String code;
     String message;
     HttpStatus httpStatus;

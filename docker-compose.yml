@@ -41,6 +41,16 @@ services:
     -   "5432:5432"
     restart: unless-stopped
 
+  redis:
+    image: redis:7.0-alpine
+    container_name: scm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "scmredis"]
+
 volumes:
   keycloak-db-data:
   app-db-data:
+  redis-data:
