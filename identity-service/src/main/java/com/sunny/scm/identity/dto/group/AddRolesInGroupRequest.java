@@ -4,7 +4,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AddUserIntoGroupRequest {
+public class AddRolesInGroupRequest {
+    List<Long> roles;
 }

@@ -1,5 +1,6 @@
 package com.sunny.scm.identity.service;
 
+import com.sunny.scm.identity.dto.group.AddRolesInGroupRequest;
 import com.sunny.scm.identity.dto.group.CreateGroupRequest;
 
 public interface GroupService {
@@ -7,5 +8,6 @@ public interface GroupService {
     void deleteGroup();
     void updateGroup();
 
-    void addUsersInGroup()
+    void addUserInGroup(Long groupId, String userId);
+    void addRolesInGroup(Long groupId, AddRolesInGroupRequest request);
 }

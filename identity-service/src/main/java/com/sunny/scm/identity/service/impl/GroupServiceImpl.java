@@ -2,11 +2,14 @@ package com.sunny.scm.identity.service.impl;
 
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
+import com.sunny.scm.identity.dto.group.AddRolesInGroupRequest;
 import com.sunny.scm.identity.dto.group.CreateGroupRequest;
 import com.sunny.scm.identity.entity.Group;
 import com.sunny.scm.identity.entity.Role;
+import com.sunny.scm.identity.entity.User;
 import com.sunny.scm.identity.repository.GroupRepository;
 import com.sunny.scm.identity.repository.RoleRepository;
+import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,7 @@ import java.util.Set;
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
     @Override
     public void createGroup(CreateGroupRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -42,7 +46,8 @@ public class GroupServiceImpl implements GroupService {
                     .groupName(request.getGroupName())
                     .companyId(Long.valueOf(companyId))
                     .createdBy(userId)
-                    .roles(new HashSet<>()).build();
+                    .roles(new HashSet<>())
+                    .users(new HashSet<>()).build();
 
             Set<Role> roles = request.getRoles().stream().map(
                     roleId -> roleRepository.findByIdAndIsActiveTrue(roleId)
@@ -65,6 +70,23 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void updateGroup() {
+
+    }
+
+    @Override
+    public void addUserInGroup(Long groupId, String userId) {
+        User user = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND));
+
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+
+        group.getUsers().add(user);
+        groupRepository.save(group);
+    }
+
+    @Override
+    public void addRolesInGroup(Long groupId, AddRolesInGroupRequest request) {
 
     }
 }

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
+    Optional<User> findByUserId(String userId);
     Optional<User> findByEmail(String email);
     @Query("SELECT DISTINCT r.roleName FROM User u " +
             "JOIN u.groups g " +
