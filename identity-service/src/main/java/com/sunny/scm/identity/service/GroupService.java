@@ -6,4 +6,6 @@ public interface GroupService {
     void createGroup(CreateGroupRequest request);
     void deleteGroup();
     void updateGroup();
+
+    void addUsersInGroup()
 }

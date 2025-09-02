@@ -18,5 +18,5 @@ public class CreateGroupRequest {
     String groupName;
 
     @JsonProperty("roles")
-    List<RoleDto> roles;
+    List<Long> roles;
 }

@@ -2,9 +2,7 @@ package com.sunny.scm.identity.entity;
 
 import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,6 +23,8 @@ import java.util.Set;
         })
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Group extends BaseEntity {
 
@@ -34,7 +34,7 @@ public class Group extends BaseEntity {
     @Column(name = "group_name")
     String groupName;
 
-    @Column(name = "create_by")
+    @Column(name = "created_by")
     String createdBy;
 
     @ManyToMany(fetch = FetchType.LAZY)

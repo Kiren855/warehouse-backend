@@ -24,9 +24,10 @@ import java.util.Set;
             @UniqueConstraint(columnNames = {"company_id", "username"})
         }
 )
-public class User extends BaseEntity {
+public class User {
 
-    @Column(name = "user_id")
+    @Id
+    @Column(name = "user_id", nullable = false, updatable = false)
     String userId;
 
     @Column(name = "email",unique = true)
@@ -50,4 +51,12 @@ public class User extends BaseEntity {
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     Set<Group> groups;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime creationTimestamp;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    LocalDateTime updateTimestamp;
 }

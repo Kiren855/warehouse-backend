@@ -26,6 +26,7 @@ public class SecurityConfig {
             "/identity/api/v1/auth/login",
             "/identity/api/v1/auth/refresh",
             "/identity/api/v1/auth/logout",
+            "/identity/api/v1/auth/hello",
             "/internal/**"
     };
 

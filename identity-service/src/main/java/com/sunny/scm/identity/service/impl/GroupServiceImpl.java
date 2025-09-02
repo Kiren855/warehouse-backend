@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -40,10 +41,11 @@ public class GroupServiceImpl implements GroupService {
             Group group = Group.builder()
                     .groupName(request.getGroupName())
                     .companyId(Long.valueOf(companyId))
-                    .createdBy(userId).build();
+                    .createdBy(userId)
+                    .roles(new HashSet<>()).build();
 
             Set<Role> roles = request.getRoles().stream().map(
-                    role -> roleRepository.findByIdAndIsActiveTrue(role.getId())
+                    roleId -> roleRepository.findByIdAndIsActiveTrue(roleId)
                             .orElseThrow(() -> new AppException(IdentityErrorCode.ROLE_NOT_FOUND))
             ).collect(java.util.stream.Collectors.toSet());
 

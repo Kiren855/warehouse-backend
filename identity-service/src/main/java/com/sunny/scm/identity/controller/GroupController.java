@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/identity/api/v1/groups")
 @RequiredArgsConstructor
 public class GroupController {
-    private GroupService groupService;
+
+    private final GroupService groupService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('ROOT')")
     public ResponseEntity<?> createGroup(@Valid @RequestBody CreateGroupRequest request) {
         groupService.createGroup(request);
         IdentitySuccessCode successCode = IdentitySuccessCode.GROUP_CREATE_SUCCESS;

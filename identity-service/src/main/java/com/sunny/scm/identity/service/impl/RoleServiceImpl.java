@@ -3,7 +3,6 @@ package com.sunny.scm.identity.service.impl;
 import com.sunny.scm.common.service.RedisService;
 import com.sunny.scm.identity.service.RoleService;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

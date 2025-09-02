@@ -44,6 +44,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Value("${keycloak.client-secret}")
     String clientSecret;
     @Override
+    @Transactional
     public String register(RegisterRootRequest request) {
 
         userRepository.findByEmail(request.getEmail())
@@ -107,7 +108,6 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    @Transactional
     public String register(RegisterSubRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
