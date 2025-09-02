@@ -87,6 +87,15 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void addRolesInGroup(Long groupId, AddRolesInGroupRequest request) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
+        Set<Role> roles = request.getRoles().stream().map(
+                roleId -> roleRepository.findByIdAndIsActiveTrue(roleId)
+                        .orElseThrow(() -> new AppException(IdentityErrorCode.ROLE_NOT_FOUND))
+        ).collect(java.util.stream.Collectors.toSet());
+
+        group.getRoles().addAll(roles);
+        groupRepository.save(group);
     }
 }
