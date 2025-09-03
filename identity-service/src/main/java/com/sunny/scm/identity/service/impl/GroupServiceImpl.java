@@ -131,11 +131,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void updateGroup(Long groupId, String groupName) {
+    public void updateGroup(Long groupId, UpdateGroupRequest request) {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
-        group.setGroupName(groupName);
+        group.setGroupName(request.getGroupName());
         groupRepository.save(group);
     }
 

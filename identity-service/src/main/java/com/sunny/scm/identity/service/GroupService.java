@@ -12,7 +12,7 @@ public interface GroupService {
     RoleGroupResponse getRolesInGroup(Long groupId);
     void createGroup(CreateGroupRequest request);
     void deleteGroup(Long groupId);
-    void updateGroup(Long groupId, String groupName);
+    void updateGroup(Long groupId, UpdateGroupRequest request);
 
     void addUserInGroup(Long groupId, String userId);
     void addRolesInGroup(Long groupId, RolesInGroupRequest request);
