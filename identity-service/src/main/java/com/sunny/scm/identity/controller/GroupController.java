@@ -3,12 +3,11 @@ package com.sunny.scm.identity.controller;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.identity.constant.IdentitySuccessCode;
-import com.sunny.scm.identity.dto.group.RolesInGroupRequest;
-import com.sunny.scm.identity.dto.group.CreateGroupRequest;
-import com.sunny.scm.identity.dto.group.UpdateGroupRequest;
+import com.sunny.scm.identity.dto.group.*;
 import com.sunny.scm.identity.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/identity/api/v1/groups")
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
+@Slf4j
 public class GroupController {
 
     private final GroupService groupService;
@@ -109,22 +109,48 @@ public class GroupController {
     @GetMapping("/{groupId}/roles")
     public ResponseEntity<?> getRolesInGroup(@PathVariable Long groupId) {
         IdentitySuccessCode successCode = IdentitySuccessCode.ROLE_GET_IN_GROUP_SUCCESS;
+        RoleGroupResponse role = groupService.getRolesInGroup(groupId);
+
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
-                .result(groupService.getRolesInGroup(groupId))
+                .result(role)
                 .build());
     }
 
     @GetMapping("/{groupId}/users")
     public ResponseEntity<?> getUsersInGroup(@PathVariable Long groupId) {
         IdentitySuccessCode successCode = IdentitySuccessCode.USER_GET_IN_GROUP_SUCCESS;
+        UserGroupResponse users = groupService.getUsersInGroup(groupId);
+
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
-                .result(groupService.getUsersInGroup(groupId))
+                .result(users)
+                .build());
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getGroups() {
+        IdentitySuccessCode successCode = IdentitySuccessCode.GET_GROUP_SUCCESS;
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .result(groupService.getGroups())
+                .build());
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<?> getGroup(@PathVariable Long groupId) {
+        IdentitySuccessCode successCode = IdentitySuccessCode.GET_GROUP_SUCCESS;
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .result(groupService.getGroup(groupId))
                 .build());
     }
 }

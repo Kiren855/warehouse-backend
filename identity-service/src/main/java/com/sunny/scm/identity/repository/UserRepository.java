@@ -12,6 +12,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     Optional<User> findByUserId(String userId);
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByUsernameOrEmail(String username, String email);
+
     @Query("SELECT DISTINCT r.roleName FROM User u " +
             "JOIN u.groups g " +
             "JOIN g.roles r " +

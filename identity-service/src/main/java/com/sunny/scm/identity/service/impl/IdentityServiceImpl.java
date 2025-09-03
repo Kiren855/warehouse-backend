@@ -3,6 +3,7 @@ package com.sunny.scm.identity.service.impl;
 
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
+import com.sunny.scm.common.service.RedisService;
 import com.sunny.scm.identity.client.KeycloakClient;
 import com.sunny.scm.identity.constant.GrantType;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
@@ -37,6 +38,7 @@ public class IdentityServiceImpl implements IdentityService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final KeycloakClient keycloakClient;
+    private final RedisService redisService;
 
     @Value("${keycloak.client-id}")
     String clientId;
@@ -168,6 +170,17 @@ public class IdentityServiceImpl implements IdentityService {
                     ? request.getUsername()
                     : request.getEmail();
 
+            User user = userRepository.findByUsernameOrEmail(loginId, loginId)
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
+
+            if (!user.isActive()) {
+                throw new AppException(IdentityErrorCode.ACCOUNT_DISABLED);
+            }
+
+            // store roles into redis
+            createUserRoles(user.getUserId());
+
+            // get token client
             String clientToken = getClientToken();
 
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -236,5 +249,11 @@ public class IdentityServiceImpl implements IdentityService {
 
         var clientToken = keycloakClient.exchangeToken(form);
         return clientToken.getAccessToken();
+    }
+    private void createUserRoles(String userId) {
+        List<String> roles = userRepository.findRolesByUserId(userId);
+        String key = "user_roles_" + userId;
+        redisService.setValue(key, roles, 1800);
+        log.info("Stored roles for user with key: {} : {}", key, roles);
     }
 }

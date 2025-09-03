@@ -24,7 +24,7 @@ public enum IdentitySuccessCode implements BaseCodeError {
     USER_DELETE_FROM_GROUP_SUCCESS("S10013", "delete user from group successfully", HttpStatus.OK),
     ROLE_GET_IN_GROUP_SUCCESS("S10014", "get roles in group successfully", HttpStatus.OK),
     USER_GET_IN_GROUP_SUCCESS("S10015", "get users in group successfully", HttpStatus.OK),
-    ;
+    GET_GROUP_SUCCESS("S10016", "get group successfully", HttpStatus.OK),;
     String code;
     String message;
     HttpStatus httpStatus;

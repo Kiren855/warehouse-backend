@@ -1,6 +1,7 @@
 package com.sunny.scm.identity.service.impl;
 
 import com.sunny.scm.common.service.RedisService;
+import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +19,13 @@ import java.util.Objects;
 public class RoleServiceImpl implements RoleService {
 
     private final RedisService redisService;
+    private final UserRepository userRepository;
     @Override
-    public void createUserRoles(List<String> roles) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
-
-        String key = "user_roles_" + userId;
-        redisService.setValue(key, roles, 1800);
+    public void createUserRoles(String userId) {
+        List<String> roles = userRepository.findRolesByUserId(userId);
+        log.info("Fetched roles for user {}: {}", userId, roles.size());
+//        String key = "user_roles_" + userId;
+//        redisService.setValue(key, roles, 1800);
         log.info("Stored roles for user {}: {}", userId, roles);
     }
 
