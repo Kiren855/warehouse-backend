@@ -102,4 +102,26 @@ public class GroupController {
                 .message(successCode.getMessage())
                 .build());
     }
+
+    @GetMapping("/{groupId}/roles")
+    public ResponseEntity<?> getRolesInGroup(@PathVariable Long groupId) {
+        IdentitySuccessCode successCode = IdentitySuccessCode.ROLE_GET_IN_GROUP_SUCCESS;
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .result(groupService.getRolesInGroup(groupId))
+                .build());
+    }
+
+    @GetMapping("/{groupId}/users")
+    public ResponseEntity<?> getUsersInGroup(@PathVariable Long groupId) {
+        IdentitySuccessCode successCode = IdentitySuccessCode.USER_GET_IN_GROUP_SUCCESS;
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .result(groupService.getUsersInGroup(groupId))
+                .build());
+    }
 }
