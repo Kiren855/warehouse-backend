@@ -39,7 +39,6 @@ public class GroupController {
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
                 .build());
-
     }
 
     @PostMapping("/{groupId}/roles")
@@ -71,6 +70,31 @@ public class GroupController {
     public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) {
         groupService.deleteGroup(groupId);
         IdentitySuccessCode successCode = IdentitySuccessCode.GROUP_DELETE_SUCCESS;
+
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .build());
+    }
+
+    @DeleteMapping("/{groupId}/roles")
+    public ResponseEntity<?> removeRolesFromGroup(@PathVariable Long groupId,
+    @RequestBody RolesInGroupRequest request) {
+        groupService.removeRoleFromGroup(groupId, request);
+        IdentitySuccessCode successCode = IdentitySuccessCode.ROLE_DELETE_FROM_GROUP_SUCCESS;
+
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .build());
+    }
+
+    @DeleteMapping("/{groupId}/users/{userId}")
+    public ResponseEntity<?> removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userId) {
+        groupService.removeUserFromGroup(groupId, userId);
+        IdentitySuccessCode successCode = IdentitySuccessCode.USER_DELETE_FROM_GROUP_SUCCESS;
 
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()

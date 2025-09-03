@@ -1,7 +1,9 @@
 package com.sunny.scm.identity.service.impl;
 
+import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
+import com.sunny.scm.identity.dto.group.GroupResponse;
 import com.sunny.scm.identity.dto.group.RolesInGroupRequest;
 import com.sunny.scm.identity.dto.group.CreateGroupRequest;
 import com.sunny.scm.identity.entity.Group;
@@ -20,6 +22,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -29,6 +32,33 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+
+    @Override
+    public GroupResponse getGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+
+        return GroupResponse.builder()
+                .id(group.getId())
+                .groupName(group.getGroupName())
+                .build();
+    }
+
+    @Override
+    public List<GroupResponse> getGroups() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String companyId = jwt.getClaimAsString("company_id");
+
+        List<Group> groups = groupRepository.findByCompanyId(Long.valueOf(companyId));
+        return groups.stream().map(
+                group -> GroupResponse.builder()
+                        .id(group.getId())
+                        .groupName(group.getGroupName())
+                        .build()
+        ).toList();
+    }
+
     @Override
     public void createGroup(CreateGroupRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -108,11 +138,32 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void removeRoleFromGroup(Long groupId, RolesInGroupRequest request) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
+       try {
+           Set<Role> roles = request.getRoles().stream().map(
+                   roleId -> roleRepository.findById(roleId)
+                           .orElseThrow(() -> new AppException(IdentityErrorCode.ROLE_NOT_FOUND))
+           ).collect(java.util.stream.Collectors.toSet());
+
+           group.getRoles().removeAll(roles);
+           groupRepository.save(group);
+       } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
+       }
     }
 
     @Override
     public void removeUserFromGroup(Long groupId, String userId) {
+        User user = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND));
 
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+
+        group.getUsers().remove(user);
+        groupRepository.save(group);
     }
 }
