@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class UsersResponse {
-    Long id;
+    String userId;
     String username;
 }

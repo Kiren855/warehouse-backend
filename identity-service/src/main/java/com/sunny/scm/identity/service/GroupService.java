@@ -1,14 +1,15 @@
 package com.sunny.scm.identity.service;
 
-import com.sunny.scm.identity.dto.group.GroupResponse;
-import com.sunny.scm.identity.dto.group.RolesInGroupRequest;
-import com.sunny.scm.identity.dto.group.CreateGroupRequest;
+import com.sunny.scm.identity.dto.group.*;
 
 import java.util.List;
 
 public interface GroupService {
     GroupResponse getGroup(Long groupId);
     List<GroupResponse> getGroups();
+
+    UserGroupResponse getUsersInGroup(Long groupId);
+    RoleGroupResponse getRolesInGroup(Long groupId);
     void createGroup(CreateGroupRequest request);
     void deleteGroup(Long groupId);
     void updateGroup(Long groupId, String groupName);

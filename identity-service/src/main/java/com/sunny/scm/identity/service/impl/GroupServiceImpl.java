@@ -3,9 +3,8 @@ package com.sunny.scm.identity.service.impl;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
-import com.sunny.scm.identity.dto.group.GroupResponse;
-import com.sunny.scm.identity.dto.group.RolesInGroupRequest;
-import com.sunny.scm.identity.dto.group.CreateGroupRequest;
+import com.sunny.scm.identity.dto.auth.UsersResponse;
+import com.sunny.scm.identity.dto.group.*;
 import com.sunny.scm.identity.entity.Group;
 import com.sunny.scm.identity.entity.Role;
 import com.sunny.scm.identity.entity.User;
@@ -57,6 +56,36 @@ public class GroupServiceImpl implements GroupService {
                         .groupName(group.getGroupName())
                         .build()
         ).toList();
+    }
+
+    @Override
+    public UserGroupResponse getUsersInGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+
+        return UserGroupResponse.builder()
+                .users(group.getUsers().stream().map(
+                        user -> UsersResponse.builder()
+                                .userId(user.getUserId())
+                                .username(user.getUsername()).build()
+                ).toList())
+                .build();
+    }
+
+    @Override
+    public RoleGroupResponse getRolesInGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+
+        return RoleGroupResponse.builder()
+                .roles(group.getRoles().stream().map(
+                        role -> RoleResponse.builder()
+                                .id(role.getId())
+                                .roleName(role.getRoleName())
+                                .description(role.getDescription())
+                                .build()
+                ).toList())
+                .build();
     }
 
     @Override
