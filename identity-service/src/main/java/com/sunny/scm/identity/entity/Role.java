@@ -2,10 +2,7 @@ package com.sunny.scm.identity.entity;
 
 import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -13,6 +10,7 @@ import java.util.Set;
 @Entity
 @Table(name = "roles")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

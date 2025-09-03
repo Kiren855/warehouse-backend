@@ -22,6 +22,7 @@ import java.util.Set;
             @Index(name = "idx_group_company_id", columnList = "company_id")
         })
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

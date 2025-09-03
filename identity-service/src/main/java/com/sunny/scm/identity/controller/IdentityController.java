@@ -40,7 +40,6 @@ public class IdentityController {
     }
 
     @PostMapping("sub/register")
-    @PreAuthorize("hasRole('ROOT')")
     public ResponseEntity<ApiResponse<?>> register(@Valid @RequestBody RegisterSubRequest request) {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .message(identityRootService.register(request)).build();

@@ -2,7 +2,7 @@ package com.sunny.scm.identity.service.impl;
 
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
-import com.sunny.scm.identity.dto.group.AddRolesInGroupRequest;
+import com.sunny.scm.identity.dto.group.RolesInGroupRequest;
 import com.sunny.scm.identity.dto.group.CreateGroupRequest;
 import com.sunny.scm.identity.entity.Group;
 import com.sunny.scm.identity.entity.Role;
@@ -64,13 +64,20 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void deleteGroup() {
+    public void deleteGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
+        groupRepository.delete(group);
     }
 
     @Override
-    public void updateGroup() {
+    public void updateGroup(Long groupId, String groupName) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
+        group.setGroupName(groupName);
+        groupRepository.save(group);
     }
 
     @Override
@@ -86,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void addRolesInGroup(Long groupId, AddRolesInGroupRequest request) {
+    public void addRolesInGroup(Long groupId, RolesInGroupRequest request) {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
@@ -97,5 +104,15 @@ public class GroupServiceImpl implements GroupService {
 
         group.getRoles().addAll(roles);
         groupRepository.save(group);
+    }
+
+    @Override
+    public void removeRoleFromGroup(Long groupId, RolesInGroupRequest request) {
+
+    }
+
+    @Override
+    public void removeUserFromGroup(Long groupId, String userId) {
+
     }
 }

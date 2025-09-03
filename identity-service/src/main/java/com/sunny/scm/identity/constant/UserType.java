@@ -1,4 +1,4 @@
-package com.sunny.scm.identity.entity;
+package com.sunny.scm.identity.constant;
 
 public enum UserType {
     ROOT,

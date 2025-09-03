@@ -1,14 +1,13 @@
 package com.sunny.scm.identity.entity;
 
 
-import com.sunny.scm.common.base.BaseEntity;
+import com.sunny.scm.identity.constant.UserType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -16,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(

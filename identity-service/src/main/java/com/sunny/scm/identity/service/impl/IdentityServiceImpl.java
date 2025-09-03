@@ -10,7 +10,7 @@ import com.sunny.scm.identity.constant.RealmRoles;
 import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
 import com.sunny.scm.identity.entity.User;
-import com.sunny.scm.identity.entity.UserType;
+import com.sunny.scm.identity.constant.UserType;
 import com.sunny.scm.identity.repository.CompanyRepository;
 import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.IdentityService;
