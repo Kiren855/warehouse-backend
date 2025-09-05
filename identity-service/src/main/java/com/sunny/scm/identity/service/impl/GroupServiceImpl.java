@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -211,18 +212,15 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
-       try {
-           Set<Role> roles = request.getRoles().stream().map(
-                   roleId -> roleRepository.findById(roleId)
-                           .orElseThrow(() -> new AppException(IdentityErrorCode.ROLE_NOT_FOUND))
-           ).collect(java.util.stream.Collectors.toSet());
+        if(!request.getRoles().isEmpty()) {
+            Set<Role> roles = request.getRoles().stream().map(
+                    roleId -> roleRepository.findById(roleId)
+                            .orElseThrow(() -> new AppException(IdentityErrorCode.ROLE_NOT_FOUND))
+            ).collect(Collectors.toSet());
 
-           group.getRoles().removeAll(roles);
-           groupRepository.save(group);
-       } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
-       }
+            group.getRoles().removeAll(roles);
+            groupRepository.save(group);
+        }
     }
 
     @Override
@@ -230,12 +228,14 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
-        Set<User> users = request.getUsers().stream().map(
-                userId -> userRepository.findByUserId(userId)
-                        .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND))
-        ).collect(java.util.stream.Collectors.toSet());
+        if(!request.getUsers().isEmpty()) {
+            Set<User> users = request.getUsers().stream().map(
+                    userId -> userRepository.findByUserId(userId)
+                            .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND))
+            ).collect(Collectors.toSet());
 
-        group.getUsers().removeAll(users);
-        groupRepository.save(group);
+            group.getUsers().removeAll(users);
+            groupRepository.save(group);
+        }
     }
 }
