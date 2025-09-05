@@ -1,5 +1,6 @@
 package com.sunny.scm.identity.service;
 
+import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.identity.dto.group.*;
 import org.springframework.data.domain.Page;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 public interface GroupService {
     GroupResponse getGroup(Long groupId);
-    Page<GroupResponse> getGroups(int page, int size);
+    PageResponse<GroupResponse> getGroups(int page, int size);
 
     UserGroupResponse getUsersInGroup(Long groupId);
     RoleGroupResponse getRolesInGroup(Long groupId);

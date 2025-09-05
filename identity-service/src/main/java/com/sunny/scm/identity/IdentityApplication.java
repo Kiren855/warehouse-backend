@@ -28,7 +28,6 @@ import java.util.List;
 		"com.sunny.scm.common",
 		"com.sunny.scm.identity"
 })
-@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class IdentityApplication {
     public static void main(String[] args) {
 		SpringApplication.run(IdentityApplication.class, args);

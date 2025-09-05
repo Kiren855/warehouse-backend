@@ -1,6 +1,7 @@
 package com.sunny.scm.identity.service.impl;
 
 import com.sunny.scm.common.constant.GlobalErrorCode;
+import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
@@ -49,22 +50,28 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Cacheable(value = "get_groups", key = "'page:' + #page + ':size:' + #size", unless = "#result == null || #result.isEmpty()", cacheManager = "cacheManager")
-    public Page<GroupResponse> getGroups(int page, int size) {
+    public PageResponse<GroupResponse> getGroups(int page, int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String companyId = jwt.getClaimAsString("company_id");
 
-        Page<Group> groups = groupRepository
-            .findAllByCompanyId(Long.valueOf(companyId), PageRequest.of(page, size));
+        Page<Group> groups = groupRepository.findAllByCompanyId(
+                Long.valueOf(companyId),
+                PageRequest.of(page, size)
+        );
 
-        return groups.map(group -> GroupResponse.builder()
+        Page<GroupResponse> mappedPage = groups.map(group -> GroupResponse.builder()
                 .id(group.getId())
                 .groupName(group.getGroupName())
-                .usernameCreated(userRepository.findByUserId(group.getCreatedBy())
-                        .map(User::getUsername)
-                        .orElse("Unknown"))
-                .build());
+                .usernameCreated(
+                        userRepository.findByUserId(group.getCreatedBy())
+                                .map(User::getUsername)
+                                .orElse("Unknown")
+                )
+                .build()
+        );
+
+        return PageResponse.from(mappedPage);
     }
 
     @Override

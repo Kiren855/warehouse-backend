@@ -1,5 +1,6 @@
 package com.sunny.scm.identity.service.impl;
 
+import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.identity.constant.UserType;
 import com.sunny.scm.identity.dto.auth.UsersResponse;
 import com.sunny.scm.common.dto.RoleResponse;
@@ -24,13 +25,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     @Override
-    public Page<UsersResponse> getUsers(int page, int size) {
+    public PageResponse<UsersResponse> getUsers(int page, int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = authentication.getName();
         String companyId = jwt.getClaimAsString("company_id");
 
-        return userRepository.findAllByCompanyIdAndUserType(
+        Page<UsersResponse> users =  userRepository.findAllByCompanyIdAndUserType(
                         Long.valueOf(companyId),
                         UserType.SUB,
                         PageRequest.of(page, size))
@@ -39,6 +39,8 @@ public class UserServiceImpl implements UserService {
                         .username(user.getUsername())
                         .isActive(user.isActive())
                         .build());
+
+        return PageResponse.from(users);
     }
 
     @Override
