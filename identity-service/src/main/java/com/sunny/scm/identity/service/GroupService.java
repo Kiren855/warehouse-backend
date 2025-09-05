@@ -1,6 +1,7 @@
 package com.sunny.scm.identity.service;
 
 import com.sunny.scm.common.dto.PageResponse;
+import com.sunny.scm.identity.dto.auth.UsersResponse;
 import com.sunny.scm.identity.dto.group.*;
 import org.springframework.data.domain.Page;
 
@@ -10,8 +11,8 @@ public interface GroupService {
     GroupResponse getGroup(Long groupId);
     PageResponse<GroupResponse> getGroups(int page, int size);
 
-    UserGroupResponse getUsersInGroup(Long groupId);
-    RoleGroupResponse getRolesInGroup(Long groupId);
+    PageResponse<UsersResponse> getUsersInGroup(Long groupId, int page, int size);
+    PageResponse<RoleDetailResponse> getRolesInGroup(Long groupId, int page, int size);
     void createGroup(CreateGroupRequest request);
     void deleteGroup(Long groupId);
     void updateGroup(Long groupId, UpdateGroupRequest request);
@@ -21,5 +22,5 @@ public interface GroupService {
     void addUsersInGroup(Long groupId, UsersInGroupRequest request);
 
     void removeRoleFromGroup(Long groupId, RolesInGroupRequest request);
-    void removeUserFromGroup(Long groupId, String userId);
+    void removeUsersFromGroup(Long groupId, UsersInGroupRequest request);
 }

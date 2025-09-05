@@ -30,6 +30,7 @@ public class RoleServiceImpl implements RoleService {
             .findAllByIsActiveTrue(PageRequest.of(page, size)).map(role -> RoleResponse.builder()
                 .id(role.getId())
                 .roleName(role.getRoleName())
+                .description(role.getDescription())
                 .build());
 
         return PageResponse.from(roles);

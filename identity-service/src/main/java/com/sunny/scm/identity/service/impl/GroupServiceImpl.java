@@ -75,35 +75,44 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public UserGroupResponse getUsersInGroup(Long groupId) {
+    public PageResponse<UsersResponse> getUsersInGroup(Long groupId, int page, int size) {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
-        return UserGroupResponse.builder()
-                .users(group.getUsers().stream().map(
-                        user -> UsersResponse.builder()
-                                .userId(user.getUserId())
-                                .username(user.getUsername())
-                                .isActive(user.isActive())
-                                .build()
-                ).toList())
-                .build();
+        Page<User> users = groupRepository.findUsersByGroupId(
+                groupId,
+                PageRequest.of(page, size)
+        );
+
+        Page<UsersResponse> mappedPage = users.map(user -> UsersResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .isActive(user.isActive())
+                .build()
+        );
+
+        return PageResponse.from(mappedPage);
     }
 
     @Override
-    public RoleGroupResponse getRolesInGroup(Long groupId) {
+    public PageResponse<RoleDetailResponse> getRolesInGroup(Long groupId, int page, int size) {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
-        return RoleGroupResponse.builder()
-                .roles(group.getRoles().stream().map(
-                        role -> RoleResponse.builder()
-                                .id(role.getId())
-                                .roleName(role.getRoleName())
-                                .description(role.getDescription())
-                                .build()
-                ).toList())
-                .build();
+        Page<Role> roles = groupRepository.findRolesByGroupId(
+                groupId,
+                PageRequest.of(page, size)
+        );
+
+        Page<RoleDetailResponse> mappedPage = roles.map(role -> RoleDetailResponse.builder()
+                .id(role.getId())
+                .roleName(role.getRoleName())
+                .description(role.getDescription())
+                .build()
+        );
+
+        return PageResponse.from(mappedPage);
+
     }
 
     @Override
@@ -217,14 +226,16 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void removeUserFromGroup(Long groupId, String userId) {
-        User user = userRepository.findByUserId(userId)
-            .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND));
-
+    public void removeUsersFromGroup(Long groupId, UsersInGroupRequest request) {
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
-        group.getUsers().remove(user);
+        Set<User> users = request.getUsers().stream().map(
+                userId -> userRepository.findByUserId(userId)
+                        .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND))
+        ).collect(java.util.stream.Collectors.toSet());
+
+        group.getUsers().removeAll(users);
         groupRepository.save(group);
     }
 }

@@ -110,9 +110,10 @@ public class GroupController {
                 .build());
     }
 
-    @DeleteMapping("/{groupId}/users/{userId}")
-    public ResponseEntity<?> removeUserFromGroup(@PathVariable Long groupId, @PathVariable String userId) {
-        groupService.removeUserFromGroup(groupId, userId);
+    @DeleteMapping("/{groupId}/users")
+    public ResponseEntity<?> removeUsersFromGroup(@PathVariable Long groupId,
+    @RequestBody UsersInGroupRequest request) {
+        groupService.removeUsersFromGroup(groupId, request);
         IdentitySuccessCode successCode = IdentitySuccessCode.USER_DELETE_FROM_GROUP_SUCCESS;
 
         return ResponseEntity.status(successCode.getHttpStatus())
@@ -123,28 +124,30 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/roles")
-    public ResponseEntity<?> getRolesInGroup(@PathVariable Long groupId) {
+    public ResponseEntity<?> getRolesInGroup(@PathVariable Long groupId,
+    @RequestParam (defaultValue = "0") int page,
+    @RequestParam (defaultValue = "10") int size) {
         IdentitySuccessCode successCode = IdentitySuccessCode.ROLE_GET_IN_GROUP_SUCCESS;
-        RoleGroupResponse role = groupService.getRolesInGroup(groupId);
 
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
-                .result(role)
+                .result(groupService.getRolesInGroup(groupId, page, size))
                 .build());
     }
 
     @GetMapping("/{groupId}/users")
-    public ResponseEntity<?> getUsersInGroup(@PathVariable Long groupId) {
+    public ResponseEntity<?> getUsersInGroup(@PathVariable Long groupId,
+                                             @RequestParam (defaultValue = "0") int page,
+                                             @RequestParam (defaultValue = "10") int size) {
         IdentitySuccessCode successCode = IdentitySuccessCode.USER_GET_IN_GROUP_SUCCESS;
-        UserGroupResponse users = groupService.getUsersInGroup(groupId);
 
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
-                .result(users)
+                .result( groupService.getUsersInGroup(groupId, page, size))
                 .build());
     }
 
