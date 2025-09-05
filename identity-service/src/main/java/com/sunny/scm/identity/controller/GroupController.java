@@ -133,13 +133,14 @@ public class GroupController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getGroups() {
+    public ResponseEntity<?> getGroups(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size) {
         IdentitySuccessCode successCode = IdentitySuccessCode.GET_GROUP_SUCCESS;
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()
                 .code(successCode.getCode())
                 .message(successCode.getMessage())
-                .result(groupService.getGroups())
+                .result(groupService.getGroups(page, size))
                 .build());
     }
 
