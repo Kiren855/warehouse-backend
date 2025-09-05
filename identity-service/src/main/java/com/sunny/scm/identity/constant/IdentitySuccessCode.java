@@ -32,7 +32,8 @@ public enum IdentitySuccessCode implements BaseCodeError {
     ROLE_UPDATE_SUCCESS("S10021", "update role successfully", HttpStatus.OK),
     ROLE_DELETE_SUCCESS("S10022", "delete role successfully", HttpStatus.OK),
     ASSIGN_ROLE_TO_USER_SUCCESS("S10023", "assign role to user successfully", HttpStatus.OK),
-    REVOKE_ROLE_FROM_USER_SUCCESS("S10024", "revoke role from user successfully", HttpStatus.OK),;
+    REVOKE_ROLE_FROM_USER_SUCCESS("S10024", "revoke role from user successfully", HttpStatus.OK),
+    CHANGE_PASSWORD_SUCCESS("S10025", "change password successfully", HttpStatus.OK),;
     String code;
     String message;
     HttpStatus httpStatus;

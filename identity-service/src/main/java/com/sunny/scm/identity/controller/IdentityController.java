@@ -110,6 +110,32 @@ public class IdentityController {
         .body(apiResponse);
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changeRootPassword(@Valid @RequestBody ChangePasswordRequest request) {
+        identityRootService.changeRootPassword(request);
+
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(IdentitySuccessCode.CHANGE_PASSWORD_SUCCESS.getCode())
+                .message(IdentitySuccessCode.CHANGE_PASSWORD_SUCCESS.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @PostMapping("/{userId}/change-password")
+    public ResponseEntity<?> changeSubPassword(
+    @PathVariable String userId,
+    @Valid @RequestBody ChangePasswordRequest request) {
+        identityRootService.changeSubPassword(userId, request);
+
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(IdentitySuccessCode.CHANGE_PASSWORD_SUCCESS.getCode())
+                .message(IdentitySuccessCode.CHANGE_PASSWORD_SUCCESS.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refresh_token") String refreshToken,
         HttpServletResponse response)

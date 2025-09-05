@@ -119,6 +119,10 @@ public class IdentityServiceImpl implements IdentityService {
             String userId = authentication.getName();
             String companyId = jwt.getClaimAsString("company_id");
 
+            userRepository.findByCompanyIdAndUserId(Long.valueOf(companyId), userId).ifPresent(user -> {
+                throw new AppException(IdentityErrorCode.ACCOUNT_ALREADY_EXISTS);
+            });
+
             var userCreationRequest = UserCreationRequest.builder()
                     .username(request.getUsername())
                     .emailVerified(true)
@@ -173,7 +177,7 @@ public class IdentityServiceImpl implements IdentityService {
                     : request.getEmail();
 
             User user = userRepository.findByUsernameOrEmail(loginId, loginId)
-                    .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.USERNAME_OR_PASSWORD_UNCORRECT));
 
             if (!user.isActive()) {
                 throw new AppException(IdentityErrorCode.ACCOUNT_DISABLED);
@@ -215,6 +219,61 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (FeignException e) {
             log.info(e.getMessage());
             throw  new AppException(IdentityErrorCode.REFRESH_TOKEN_ERROR);
+        }
+    }
+
+    @Override
+    public void changeSubPassword(String userId, ChangePasswordRequest request) {
+        try {
+            User user = userRepository.findByUserId(userId)
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
+
+            String clientToken = getClientToken();
+
+            CredentialParam credential = CredentialParam.builder()
+                    .type("password")
+                    .value(request.getNewPassword())
+                    .temporary(false)
+                    .build();
+
+            keycloakClient.resetPassword(
+                    "Bearer " + clientToken,
+                    user.getUserId(),
+                    credential
+            );
+
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    public void changeRootPassword(ChangePasswordRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userId = authentication.getName();
+
+            User user = userRepository.findByUserId(userId)
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
+
+            String clientToken = getClientToken();
+
+            CredentialParam credential = CredentialParam.builder()
+                    .type("password")
+                    .value(request.getNewPassword())
+                    .temporary(false)
+                    .build();
+
+            keycloakClient.resetPassword(
+                    "Bearer " + clientToken,
+                    user.getUserId(),
+                    credential
+            );
+
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
         }
     }
 

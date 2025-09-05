@@ -38,7 +38,8 @@ public  enum IdentityErrorCode implements BaseCodeError {
     GROUP_ALREADY_EXISTS("E10029", "group name already exists in company", HttpStatus.BAD_REQUEST),
     ROLE_NOT_FOUND("E10030", "role not found", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("E10031", "user not found", HttpStatus.BAD_REQUEST),
-    ACCOUNT_DISABLED("E10032", "account disabled", HttpStatus.BAD_REQUEST),;
+    ACCOUNT_DISABLED("E10032", "account disabled", HttpStatus.BAD_REQUEST),
+    USERNAME_OR_PASSWORD_UNCORRECT("E10033", "username or password uncorrected", HttpStatus.BAD_REQUEST),;
 
     String code;
     String message;
