@@ -15,6 +15,7 @@ import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +49,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Cacheable(value = "get_groups", key = "'page:' + #page + ':size:' + #size", unless = "#result == null || #result.isEmpty()", cacheManager = "cacheManager")
     public Page<GroupResponse> getGroups(int page, int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();

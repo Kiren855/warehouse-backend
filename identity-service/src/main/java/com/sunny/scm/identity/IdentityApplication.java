@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
 		"com.sunny.scm.common",
 		"com.sunny.scm.identity"
 })
+@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class IdentityApplication {
     public static void main(String[] args) {
 		SpringApplication.run(IdentityApplication.class, args);
