@@ -1,6 +1,7 @@
 package com.sunny.scm.identity.service.impl;
 
 import com.sunny.scm.common.constant.GlobalErrorCode;
+import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
 import com.sunny.scm.identity.dto.auth.UsersResponse;
@@ -15,6 +16,9 @@ import com.sunny.scm.identity.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -44,18 +48,21 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupResponse> getGroups() {
+    public Page<GroupResponse> getGroups(int page, int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String companyId = jwt.getClaimAsString("company_id");
 
-        List<Group> groups = groupRepository.findByCompanyId(Long.valueOf(companyId));
-        return groups.stream().map(
-                group -> GroupResponse.builder()
-                        .id(group.getId())
-                        .groupName(group.getGroupName())
-                        .build()
-        ).toList();
+        Page<Group> groups = groupRepository
+            .findAllByCompanyId(Long.valueOf(companyId), PageRequest.of(page, size));
+
+        return groups.map(group -> GroupResponse.builder()
+                .id(group.getId())
+                .groupName(group.getGroupName())
+                .usernameCreated(userRepository.findByUserId(group.getCreatedBy())
+                        .map(User::getUsername)
+                        .orElse("Unknown"))
+                .build());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.sunny.scm.identity.service.impl;
 
 
 import com.sunny.scm.common.constant.GlobalErrorCode;
+import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.common.service.RedisService;
 import com.sunny.scm.identity.client.KeycloakClient;
@@ -30,6 +31,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -251,7 +253,12 @@ public class IdentityServiceImpl implements IdentityService {
         return clientToken.getAccessToken();
     }
     private void createUserRoles(String userId) {
-        List<String> roles = userRepository.findRolesByUserId(userId);
+        List<RoleResponse> roles = userRepository.findRolesByUserId(userId)
+                .stream().map(role -> RoleResponse.builder()
+                        .id(role.getId())
+                        .roleName(role.getRoleName())
+                        .build()).collect(Collectors.toList());
+
         String key = "user_roles_" + userId;
         redisService.setValue(key, roles, 1800);
         log.info("Stored roles for user with key: {} : {}", key, roles);

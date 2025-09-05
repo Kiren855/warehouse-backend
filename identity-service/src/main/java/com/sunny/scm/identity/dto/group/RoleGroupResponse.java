@@ -1,5 +1,6 @@
 package com.sunny.scm.identity.dto.group;
 
+import com.sunny.scm.common.dto.RoleResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

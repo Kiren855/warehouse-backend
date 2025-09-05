@@ -20,31 +20,24 @@ public class RoleServiceImpl implements RoleService {
 
     private final RedisService redisService;
     private final UserRepository userRepository;
-    @Override
-    public void createUserRoles(String userId) {
-        List<String> roles = userRepository.findRolesByUserId(userId);
-        log.info("Fetched roles for user {}: {}", userId, roles.size());
-//        String key = "user_roles_" + userId;
-//        redisService.setValue(key, roles, 1800);
-        log.info("Stored roles for user {}: {}", userId, roles);
-    }
+
 
     @Override
     public List<String> getUserRoles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
-
-        String key = "user_roles_" + userId;
-        Object rolesObj = redisService.getValue(key);
-        if (Objects.nonNull(rolesObj) && rolesObj instanceof List<?> roleList) {
-            if (roleList.stream().allMatch(e -> e instanceof String)) {
-                List<String> roles = new ArrayList<>();
-                for (Object item : roleList) {
-                    roles.add((String) item);
-                }
-                return roles;
-            }
-        }
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String userId = authentication.getName();
+//
+//        String key = "user_roles_" + userId;
+//        Object rolesObj = redisService.getValue(key);
+//        if (Objects.nonNull(rolesObj) && rolesObj instanceof List<?> roleList) {
+//            if (roleList.stream().allMatch(e -> e instanceof String)) {
+//                List<String> roles = new ArrayList<>();
+//                for (Object item : roleList) {
+//                    roles.add((String) item);
+//                }
+//                return roles;
+//            }
+//        }
 
         return null;
     }
@@ -61,10 +54,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public boolean hasRole(String roleName) {
-        List<String> roles = getUserRoles();
-        if (Objects.nonNull(roles)) {
-            return roles.contains(roleName);
-        }
+//        List<String> roles = getUserRoles();
+//        if (Objects.nonNull(roles)) {
+//            return roles.contains(roleName);
+//        }
         return false;
     }
 }
