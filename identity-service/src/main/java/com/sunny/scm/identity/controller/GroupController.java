@@ -47,8 +47,24 @@ public class GroupController {
     @PostMapping("/{groupId}/roles")
     public ResponseEntity<?> addRolesInGroup(@PathVariable Long groupId,
     @Valid @RequestBody RolesInGroupRequest request) {
-        groupService.addRolesInGroup(groupId, request);
+        if(!request.getRoles().isEmpty()) {
+            groupService.addRolesInGroup(groupId, request);
+        }
         IdentitySuccessCode successCode = IdentitySuccessCode.ROLE_ADD_IN_GROUP_SUCCESS;
+
+        return ResponseEntity.status(successCode.getHttpStatus())
+            .body(ApiResponse.builder()
+                .code(successCode.getCode())
+                .message(successCode.getMessage())
+                .build());
+    }
+
+    @PostMapping("/{groupId}/users")
+    public ResponseEntity<?> addUsersInGroup(@PathVariable Long groupId, @RequestBody UsersInGroupRequest request) {
+        if(!request.getUsers().isEmpty()) {
+            groupService.addUsersInGroup(groupId, request);
+        }
+        IdentitySuccessCode successCode = IdentitySuccessCode.USER_ADD_IN_GROUP_SUCCESS;
 
         return ResponseEntity.status(successCode.getHttpStatus())
             .body(ApiResponse.builder()

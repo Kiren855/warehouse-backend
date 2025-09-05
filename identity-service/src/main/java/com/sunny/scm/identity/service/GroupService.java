@@ -18,6 +18,7 @@ public interface GroupService {
 
     void addUserInGroup(Long groupId, String userId);
     void addRolesInGroup(Long groupId, RolesInGroupRequest request);
+    void addUsersInGroup(Long groupId, UsersInGroupRequest request);
 
     void removeRoleFromGroup(Long groupId, RolesInGroupRequest request);
     void removeUserFromGroup(Long groupId, String userId);

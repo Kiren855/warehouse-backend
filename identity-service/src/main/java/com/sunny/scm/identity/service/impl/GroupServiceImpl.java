@@ -83,7 +83,9 @@ public class GroupServiceImpl implements GroupService {
                 .users(group.getUsers().stream().map(
                         user -> UsersResponse.builder()
                                 .userId(user.getUserId())
-                                .username(user.getUsername()).build()
+                                .username(user.getUsername())
+                                .isActive(user.isActive())
+                                .build()
                 ).toList())
                 .build();
     }
@@ -178,6 +180,20 @@ public class GroupServiceImpl implements GroupService {
         ).collect(java.util.stream.Collectors.toSet());
 
         group.getRoles().addAll(roles);
+        groupRepository.save(group);
+    }
+
+    @Override
+    public void addUsersInGroup(Long groupId, UsersInGroupRequest request) {
+        Group group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+
+        Set<User> users = request.getUsers().stream().map(
+                userId -> userRepository.findByUserId(userId)
+                        .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND))
+        ).collect(java.util.stream.Collectors.toSet());
+
+        group.getUsers().addAll(users);
         groupRepository.save(group);
     }
 
