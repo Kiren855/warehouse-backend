@@ -27,6 +27,8 @@ public class UserController {
                 .build());
     }
 
+
+
     @GetMapping("/{userId}/roles")
     public ResponseEntity<?> getUserRoles(@PathVariable String userId) {
         IdentitySuccessCode successCode = IdentitySuccessCode.GET_USER_ROLES_SUCCESS;
