@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoggingEvent {
     String userId;
+    String username;
     Long companyId;
     String activity;
     LocalDateTime timestamp;
