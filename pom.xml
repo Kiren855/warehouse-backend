@@ -15,12 +15,14 @@
     <name>supply-chain-management</name>
     <modules>
         <module>identity-service</module>
+        <module>gateway-service</module>
         <module>discoveryserver</module>
+        <module>logging-service</module>
         <module>common</module>
     </modules>
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
         <!--suppress UnresolvedMavenProperty -->
         <docker.password>${env.DOCKER_PASS}</docker.password>
     </properties>

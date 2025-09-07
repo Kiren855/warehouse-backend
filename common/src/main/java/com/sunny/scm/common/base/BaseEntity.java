@@ -1,28 +1,33 @@
 package com.sunny.scm.common.base;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Getter
+
 @MappedSuperclass
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BaseEntity implements Serializable {
+
     @Id
-    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", nullable = false)
+    Long id;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime creationTimestamp;
+    LocalDateTime creationTimestamp;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updateTimestamp;
+    LocalDateTime updateTimestamp;
 }

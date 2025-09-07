@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception exception) {
+    ResponseEntity<ApiResponse<?>> handlingException(Exception exception) {
         ApiResponse<?> response = ApiResponse.builder()
                 .code(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
                 .message(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())

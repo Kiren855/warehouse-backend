@@ -22,16 +22,17 @@ import java.util.Collection;
 @EnableWebSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/auth/root/register",
-            "/api/v1/auth/login",
-            "/api/v1/auth/exchange_token",
-            "/api/v1/auth/logout",
+            "/identity/api/v1/auth/root/register",
+            "/identity/api/v1/auth/login",
+            "/identity/api/v1/auth/refresh",
+            "/identity/api/v1/auth/logout",
+            "/identity/api/v1/auth/hello",
             "/internal/**"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+            http.cors(cors -> {})
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()

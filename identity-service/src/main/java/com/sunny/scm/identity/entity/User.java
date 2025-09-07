@@ -1,17 +1,21 @@
 package com.sunny.scm.identity.entity;
 
 
-import com.sunny.scm.common.base.BaseEntity;
+import com.sunny.scm.identity.constant.UserType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(
@@ -20,9 +24,10 @@ import java.util.UUID;
             @UniqueConstraint(columnNames = {"company_id", "username"})
         }
 )
-public class User extends BaseEntity {
+public class User {
 
-    @Column(name = "user_id")
+    @Id
+    @Column(name = "user_id", nullable = false, updatable = false)
     String userId;
 
     @Column(name = "email",unique = true)
@@ -43,4 +48,15 @@ public class User extends BaseEntity {
 
     @Column(name = "company_id")
     Long companyId;
+
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    Set<Group> groups;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime creationTimestamp;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    LocalDateTime updateTimestamp;
 }

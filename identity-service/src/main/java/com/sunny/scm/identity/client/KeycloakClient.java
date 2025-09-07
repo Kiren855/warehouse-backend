@@ -1,9 +1,6 @@
 package com.sunny.scm.identity.client;
 
-import com.sunny.scm.identity.dto.auth.RoleParam;
-import com.sunny.scm.identity.dto.auth.TokenExchangeParam;
-import com.sunny.scm.identity.dto.auth.UserCreationRequest;
-import com.sunny.scm.identity.dto.auth.TokenExchangeResponse;
+import com.sunny.scm.identity.dto.auth.*;
 import feign.QueryMap;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -21,6 +18,16 @@ public interface KeycloakClient {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
     TokenExchangeResponse exchangeToken(@RequestBody MultiValueMap<String, String> formParams);
+
+    @PutMapping(
+            value = "/admin/realms/${keycloak.realm}/users/{userId}/reset-password",
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    void resetPassword(
+            @RequestHeader("authorization") String token,
+            @PathVariable String userId,
+            @RequestBody CredentialParam credential
+    );
 
     @PostMapping(
             value = "/admin/realms/${keycloak.realm}/users",

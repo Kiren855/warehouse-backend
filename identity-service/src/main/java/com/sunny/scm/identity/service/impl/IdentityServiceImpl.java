@@ -2,7 +2,9 @@ package com.sunny.scm.identity.service.impl;
 
 
 import com.sunny.scm.common.constant.GlobalErrorCode;
+import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
+import com.sunny.scm.common.service.RedisService;
 import com.sunny.scm.identity.client.KeycloakClient;
 import com.sunny.scm.identity.constant.GrantType;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
@@ -10,7 +12,7 @@ import com.sunny.scm.identity.constant.RealmRoles;
 import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
 import com.sunny.scm.identity.entity.User;
-import com.sunny.scm.identity.entity.UserType;
+import com.sunny.scm.identity.constant.UserType;
 import com.sunny.scm.identity.repository.CompanyRepository;
 import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.IdentityService;
@@ -29,6 +31,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class IdentityServiceImpl implements IdentityService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final KeycloakClient keycloakClient;
+    private final RedisService redisService;
 
     @Value("${keycloak.client-id}")
     String clientId;
@@ -46,13 +50,19 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     @Transactional
     public String register(RegisterRootRequest request) {
+
+        userRepository.findByEmail(request.getEmail())
+                .ifPresent(user -> {
+                    throw new AppException(IdentityErrorCode.ACCOUNT_ALREADY_EXISTS);
+                });
+
         Company company = new Company();
         companyRepository.save(company);
         try {
             // create payload request
             var userCreationRequest = UserCreationRequest.builder()
                     .email(request.getEmail())
-                    .username(request.getUsername())
+                    .username(request.getEmail())
                     .emailVerified(true)
                     .enabled(true)
                     .attributes(Map.of("company_id", List.of(company.getId().toString())))
@@ -84,7 +94,6 @@ public class IdentityServiceImpl implements IdentityService {
 
             User newUser = User.builder()
                     .userId(userId)
-                    .username(request.getUsername())
                     .email(request.getEmail())
                     .userType(UserType.ROOT)
                     .companyId(company.getId())
@@ -103,13 +112,16 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    @Transactional
     public String register(RegisterSubRequest request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Jwt jwt = (Jwt) authentication.getPrincipal();
             String userId = authentication.getName();
             String companyId = jwt.getClaimAsString("company_id");
+
+            userRepository.findByCompanyIdAndUserId(Long.valueOf(companyId), userId).ifPresent(user -> {
+                throw new AppException(IdentityErrorCode.ACCOUNT_ALREADY_EXISTS);
+            });
 
             var userCreationRequest = UserCreationRequest.builder()
                     .username(request.getUsername())
@@ -164,6 +176,17 @@ public class IdentityServiceImpl implements IdentityService {
                     ? request.getUsername()
                     : request.getEmail();
 
+            User user = userRepository.findByUsernameOrEmail(loginId, loginId)
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.USERNAME_OR_PASSWORD_UNCORRECT));
+
+            if (!user.isActive()) {
+                throw new AppException(IdentityErrorCode.ACCOUNT_DISABLED);
+            }
+
+            // store roles into redis
+            createUserRoles(user.getUserId());
+
+            // get token client
             String clientToken = getClientToken();
 
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -200,6 +223,61 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
+    public void changeSubPassword(String userId, ChangePasswordRequest request) {
+        try {
+            User user = userRepository.findByUserId(userId)
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
+
+            String clientToken = getClientToken();
+
+            CredentialParam credential = CredentialParam.builder()
+                    .type("password")
+                    .value(request.getNewPassword())
+                    .temporary(false)
+                    .build();
+
+            keycloakClient.resetPassword(
+                    "Bearer " + clientToken,
+                    user.getUserId(),
+                    credential
+            );
+
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
+    public void changeRootPassword(ChangePasswordRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userId = authentication.getName();
+
+            User user = userRepository.findByUserId(userId)
+                    .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
+
+            String clientToken = getClientToken();
+
+            CredentialParam credential = CredentialParam.builder()
+                    .type("password")
+                    .value(request.getNewPassword())
+                    .temporary(false)
+                    .build();
+
+            keycloakClient.resetPassword(
+                    "Bearer " + clientToken,
+                    user.getUserId(),
+                    credential
+            );
+
+        } catch (FeignException e) {
+            log.error(e.getMessage());
+            throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
+    }
+
+    @Override
     public void logout(String token) {
         try {
             String clientToken = getClientToken();
@@ -232,5 +310,16 @@ public class IdentityServiceImpl implements IdentityService {
 
         var clientToken = keycloakClient.exchangeToken(form);
         return clientToken.getAccessToken();
+    }
+    private void createUserRoles(String userId) {
+        List<RoleResponse> roles = userRepository.findRolesByUserId(userId)
+                .stream().map(role -> RoleResponse.builder()
+                        .id(role.getId())
+                        .roleName(role.getRoleName())
+                        .build()).collect(Collectors.toList());
+
+        String key = "user_roles_" + userId;
+        redisService.setValue(key, roles, 1800);
+        log.info("Stored roles for user with key: {} : {}", key, roles);
     }
 }

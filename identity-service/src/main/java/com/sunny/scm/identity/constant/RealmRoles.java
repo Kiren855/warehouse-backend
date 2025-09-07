@@ -7,8 +7,9 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum RealmRoles {
-    ROOT("14cfee5d-04cd-48be-b55d-22b7312d0e32", "ROOT"),
-    SUB("5b1faf33-f802-4d05-8609-b475ad7675c7", "SUB")
+    ROOT("e2076e2b-f355-4ac1-85ae-47bea4fcd987", "ROOT"),
+    SUB("b6d17c1a-947d-4f1c-9be2-ee3ade63ed1f", "SUB"),
+    ADMIN("189019e1-118c-40a3-b089-78c60c2b7984", "ADMIN")
 ;
     String id;
     String name;
