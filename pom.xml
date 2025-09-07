@@ -17,6 +17,7 @@
         <module>identity-service</module>
         <module>gateway-service</module>
         <module>discoveryserver</module>
+        <module>logging-service</module>
         <module>common</module>
     </modules>
     <properties>

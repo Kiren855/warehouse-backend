@@ -97,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public PageResponse<RoleDetailResponse> getRolesInGroup(Long groupId, int page, int size) {
-        Group group = groupRepository.findById(groupId)
+        groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
         Page<Role> roles = groupRepository.findRolesByGroupId(
