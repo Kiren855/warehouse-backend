@@ -5,11 +5,13 @@ import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
+import com.sunny.scm.identity.constant.LogAction;
 import com.sunny.scm.identity.dto.auth.UsersResponse;
 import com.sunny.scm.identity.dto.group.*;
 import com.sunny.scm.identity.entity.Group;
 import com.sunny.scm.identity.entity.Role;
 import com.sunny.scm.identity.entity.User;
+import com.sunny.scm.identity.event.LoggingProducer;
 import com.sunny.scm.identity.repository.GroupRepository;
 import com.sunny.scm.identity.repository.RoleRepository;
 import com.sunny.scm.identity.repository.UserRepository;
@@ -38,7 +40,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-
+    private final LoggingProducer loggingProducer;
     @Override
     public GroupResponse getGroup(Long groupId) {
         Group group = groupRepository.findById(groupId)
@@ -144,6 +146,10 @@ public class GroupServiceImpl implements GroupService {
             group.getRoles().addAll(roles);
 
             groupRepository.save(group);
+
+            String action = LogAction.CREATE_GROUP.format(request.getGroupName());
+            loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
+
         } catch (DataIntegrityViolationException e) {
             log.error("Data integrity violation when creating group: {}", e.getMessage());
             throw new AppException(IdentityErrorCode.GROUP_ALREADY_EXISTS);

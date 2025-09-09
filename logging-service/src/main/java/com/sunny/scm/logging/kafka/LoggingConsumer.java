@@ -31,7 +31,7 @@ public class LoggingConsumer {
                         .build()
         );
 
-        template.convertAndSend("/topic/logs", event);
+        template.convertAndSend("/topic/logs/" + event.getCompanyId(), event);
     }
 
 }
