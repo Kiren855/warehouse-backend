@@ -11,7 +11,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_activity_logs")
+@Table(name = "user_activity_logs",
+        indexes = {
+                @Index(name = "idx_company_creation", columnList = "company_id, created_at DESC")
+        })
 @Getter
 @Setter
 @Builder
@@ -27,6 +30,9 @@ public class UserActivityLog implements Serializable {
 
     @Column(name = "user_id")
     String userId;
+
+    @Column(name = "username")
+    String username;
 
     @Column(name = "company_id")
     Long companyId;
