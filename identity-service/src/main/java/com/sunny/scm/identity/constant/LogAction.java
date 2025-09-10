@@ -11,6 +11,11 @@ public enum LogAction {
     UPDATE_GROUP("Update group with name %s"),
     DELETE_GROUP("Delete group with name %s"),
     CREATE_USER("Create user with username %s"),
+    REMOVE_USER_FROM_GROUP("Remove %s users from group %s"),
+    ADD_USER_IN_GROUP("Add %s users in group %s"),
+    REMOVE_ROLE_FROM_GROUP("Remove %s roles from group %s"),
+    ADD_ROLE_IN_GROUP("Add %s roles in group %s"),
+
 
 ;
     String value;

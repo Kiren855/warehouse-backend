@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +25,16 @@ public class GlobalExceptionHandler {
         ApiResponse<?> response = ApiResponse.builder()
                 .code(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
                 .message(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(value = IOException.class)
+    ResponseEntity<ApiResponse<?>> handlingIOException(IOException exception) {
+        ApiResponse<?> response = ApiResponse.builder()
+                .code(GlobalErrorCode.FILE_PROCESSING_ERROR.getCode())
+                .message(GlobalErrorCode.FILE_PROCESSING_ERROR.getMessage())
                 .build();
 
         return ResponseEntity.badRequest().body(response);

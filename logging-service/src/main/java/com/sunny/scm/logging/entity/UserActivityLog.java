@@ -2,9 +2,7 @@ package com.sunny.scm.logging.entity;
 
 import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
@@ -18,6 +16,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserActivityLog implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
