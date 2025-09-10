@@ -13,4 +13,5 @@ public interface IdentityService {
     void changeSubPassword(String userId, ChangePasswordRequest request);
     void changeRootPassword(ChangePasswordRequest request);
     void logout(String token);
+    boolean checkPermission(String userId, String roleName);
 }

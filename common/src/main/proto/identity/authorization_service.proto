@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package identity;
+
+service AuthorizationService {
+  rpc checkPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+}
+
+message CheckPermissionRequest {
+  string user_id = 1;
+  string role = 2;
+  string resource = 3;
+}
+
+message CheckPermissionResponse {
+  bool allowed = 1;
+  string message = 2;
+}
+

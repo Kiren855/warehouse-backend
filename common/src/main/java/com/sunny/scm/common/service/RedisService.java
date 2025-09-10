@@ -15,23 +15,24 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class RedisService {
-    private final RedisTemplate<String, Object> stringTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // ------------------- String -------------------
     public void setValue(String key, Object value, long ttlInSeconds) {
-        stringTemplate.opsForValue().set(key, value, Duration.ofSeconds(ttlInSeconds));
+        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(ttlInSeconds));
     }
 
-    public Object getValue(String key) {
-        return stringTemplate.opsForValue().get(key);
+    @SuppressWarnings("unchecked")
+    public <T> T getValue(String key, Class<T> clazz) {
+        return (T) redisTemplate.opsForValue().get(key);
     }
 
     public void deleteKey(String key) {
-        stringTemplate.delete(key);
+        redisTemplate.delete(key);
     }
 
     // ------------------- Hash -------------------
     public boolean exists(String key) {
-        return Boolean.TRUE.equals(stringTemplate.hasKey(key));
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 }

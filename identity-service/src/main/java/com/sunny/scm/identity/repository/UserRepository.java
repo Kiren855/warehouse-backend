@@ -25,6 +25,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE u.userId = :userId")
     List<Role> findRolesByUserId(@Param("userId") String userId);
 
+    @Query("SELECT COUNT(r) > 0 FROM User u " +
+            "JOIN u.groups g " +
+            "JOIN g.roles r " +
+            "WHERE u.userId = :userId AND r.roleName = :roleName")
+    boolean existsRoleByUserIdAndRoleName(@Param("userId") String userId,
+                                          @Param("roleName") String roleName);
+
     Page<User> findAllByCompanyIdAndUserType(Long companyId, UserType userType, Pageable pageable);
 
     Optional<User> findByCompanyIdAndUsername(Long companyId, String username);

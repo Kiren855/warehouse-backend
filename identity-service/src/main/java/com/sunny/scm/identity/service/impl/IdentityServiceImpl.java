@@ -2,6 +2,7 @@ package com.sunny.scm.identity.service.impl;
 
 
 import com.sunny.scm.common.constant.GlobalErrorCode;
+import com.sunny.scm.common.dto.Permission;
 import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.common.service.RedisService;
@@ -9,6 +10,7 @@ import com.sunny.scm.identity.client.KeycloakClient;
 import com.sunny.scm.identity.constant.*;
 import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
+import com.sunny.scm.identity.entity.Role;
 import com.sunny.scm.identity.entity.User;
 import com.sunny.scm.identity.event.LoggingProducer;
 import com.sunny.scm.identity.repository.CompanyRepository;
@@ -29,6 +31,8 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -323,14 +327,30 @@ public class IdentityServiceImpl implements IdentityService {
         return clientToken.getAccessToken();
     }
     private void createUserRoles(String userId) {
-        List<RoleResponse> roles = userRepository.findRolesByUserId(userId)
-                .stream().map(role -> RoleResponse.builder()
-                        .id(role.getId())
-                        .roleName(role.getRoleName())
-                        .build()).collect(Collectors.toList());
+
+        Set<String> roles = userRepository.findRolesByUserId(userId)
+                .stream().map(Role::getRoleName).collect(Collectors.toSet());
+
+        Permission permission = Permission.builder()
+                .permissions(roles).build();
 
         String key = "user_roles_" + userId;
-        redisService.setValue(key, roles, 1800);
+        redisService.setValue(key, permission, 1800);
         log.info("Stored roles for user with key: {} : {}", key, roles);
     }
+
+    public boolean checkPermission(String userId, String roleName) {
+        String key = "user_roles_" + userId;
+        Permission permission = redisService.getValue(key, Permission.class);
+        if (Objects.nonNull(permission)) {
+            return permission.getPermissions().contains(roleName);
+        } else {
+            boolean hasRole = userRepository.existsRoleByUserIdAndRoleName(userId, roleName);
+            if (hasRole) {
+                createUserRoles(userId);
+            }
+            return hasRole;
+        }
+    }
+
 }
