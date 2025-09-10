@@ -1,6 +1,8 @@
 package com.sunny.scm.identity.service.impl;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.Permission;
 import com.sunny.scm.common.dto.RoleResponse;
@@ -20,6 +22,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,14 +45,14 @@ public class IdentityServiceImpl implements IdentityService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final KeycloakClient keycloakClient;
-    private final RedisService redisService;
     private final LoggingProducer loggingProducer;
-
+    private ObjectMapper objectMapper;
     @Value("${keycloak.client-id}")
     String clientId;
 
     @Value("${keycloak.client-secret}")
     String clientSecret;
+
     @Override
     @Transactional
     public String register(RegisterRootRequest request) {
@@ -81,18 +84,18 @@ public class IdentityServiceImpl implements IdentityService {
 
             //call keycloak api to create user
             var createUserResponse = keycloakClient.createUser(
-                "Bearer " + clientToken,
-                userCreationRequest
+                    "Bearer " + clientToken,
+                    userCreationRequest
             );
 
             String userId = extractUserId(createUserResponse);
             keycloakClient.assignRole(
-                "Bearer " + clientToken,
-                userId,
-                List.of(RoleParam.builder()
-                        .id(RealmRoles.ROOT.getId())
-                        .name(RealmRoles.ROOT.getName())
-                        .build())
+                    "Bearer " + clientToken,
+                    userId,
+                    List.of(RoleParam.builder()
+                            .id(RealmRoles.ROOT.getId())
+                            .name(RealmRoles.ROOT.getName())
+                            .build())
             );
 
             User newUser = User.builder()
@@ -108,7 +111,7 @@ public class IdentityServiceImpl implements IdentityService {
 
             return "register successfully";
 
-        } catch(FeignException e) {
+        } catch (FeignException e) {
             log.error(e.getMessage());
             throw new AppException(GlobalErrorCode.UNCATEGORIZED_EXCEPTION);
         }
@@ -190,9 +193,6 @@ public class IdentityServiceImpl implements IdentityService {
                 throw new AppException(IdentityErrorCode.ACCOUNT_DISABLED);
             }
 
-            // store roles into redis
-            createUserRoles(user.getUserId());
-
             // get token client
             String clientToken = getClientToken();
 
@@ -225,7 +225,7 @@ public class IdentityServiceImpl implements IdentityService {
 
         } catch (FeignException e) {
             log.info(e.getMessage());
-            throw  new AppException(IdentityErrorCode.REFRESH_TOKEN_ERROR);
+            throw new AppException(IdentityErrorCode.REFRESH_TOKEN_ERROR);
         }
     }
 
@@ -253,9 +253,9 @@ public class IdentityServiceImpl implements IdentityService {
                     user.getUserId(),
                     credential
             );
-        String action = LogAction.CHANGE_PASSWORD.format(user.getUsername());
-        loggingProducer.sendMessage(userId, "ROOT",
-                Long.valueOf(companyId), action);
+            String action = LogAction.CHANGE_PASSWORD.format(user.getUsername());
+            loggingProducer.sendMessage(userId, "ROOT",
+                    Long.valueOf(companyId), action);
 
         } catch (FeignException e) {
             log.error(e.getMessage());
@@ -326,31 +326,18 @@ public class IdentityServiceImpl implements IdentityService {
         var clientToken = keycloakClient.exchangeToken(form);
         return clientToken.getAccessToken();
     }
-    private void createUserRoles(String userId) {
-
-        Set<String> roles = userRepository.findRolesByUserId(userId)
-                .stream().map(Role::getRoleName).collect(Collectors.toSet());
-
-        Permission permission = Permission.builder()
-                .permissions(roles).build();
-
-        String key = "user_roles_" + userId;
-        redisService.setValue(key, permission, 1800);
-        log.info("Stored roles for user with key: {} : {}", key, roles);
+    @Cacheable(value = "user_roles", key = "#userId")
+    private List<Permission> getUserPermissions(String userId) {
+        return userRepository.findRolesByUserId(userId)
+                .stream()
+                .map(role -> Permission.builder()
+                        .permissions(role.getRoleName())
+                        .build())
+                .collect(Collectors.toList());
     }
-
     public boolean checkPermission(String userId, String roleName) {
-        String key = "user_roles_" + userId;
-        Permission permission = redisService.getValue(key, Permission.class);
-        if (Objects.nonNull(permission)) {
-            return permission.getPermissions().contains(roleName);
-        } else {
-            boolean hasRole = userRepository.existsRoleByUserIdAndRoleName(userId, roleName);
-            if (hasRole) {
-                createUserRoles(userId);
-            }
-            return hasRole;
-        }
+        List<Permission> permissions = getUserPermissions(userId);
+        return permissions.stream()
+                .anyMatch(p -> roleName.equals(p.getPermissions()));
     }
-
 }

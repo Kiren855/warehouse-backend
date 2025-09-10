@@ -1,5 +1,8 @@
 package com.sunny.scm.common.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,23 +19,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
-    // ------------------- String -------------------
     public void setValue(String key, Object value, long ttlInSeconds) {
-        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(ttlInSeconds));
+        try {
+            String json = objectMapper.writeValueAsString(value);
+            redisTemplate.opsForValue().set(key, json, Duration.ofSeconds(ttlInSeconds));
+        } catch (Exception e) {
+            log.error("Error serializing value for key {}: {}", key, e.getMessage());
+        }
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getValue(String key, Class<T> clazz) {
-        return (T) redisTemplate.opsForValue().get(key);
+        try {
+            String json = (String) redisTemplate.opsForValue().get(key);
+            return json != null ? objectMapper.readValue(json, clazz) : null;
+        } catch (Exception e) {
+            log.error("Error deserializing value for key {}: {}", key, e.getMessage());
+            return null;
+        }
     }
+
+    public <T> T getListValue(String key, JavaType type) {
+        try {
+            String json = (String) redisTemplate.opsForValue().get(key);
+            return json != null ? objectMapper.readValue(json, type) : null;
+        } catch (Exception e) {
+            log.error("Error deserializing list for key {}: {}", key, e.getMessage());
+            return null;
+        }
+    }
+
 
     public void deleteKey(String key) {
         redisTemplate.delete(key);
-    }
-
-    // ------------------- Hash -------------------
-    public boolean exists(String key) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 }

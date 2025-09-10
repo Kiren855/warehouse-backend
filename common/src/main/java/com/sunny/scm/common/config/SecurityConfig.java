@@ -23,7 +23,8 @@ public class SecurityConfig {
             "/identity/api/v1/auth/hello",
             "/internal/**",
             "/logging/ws-logs/**",
-            "logging/ws-logs",
+            "/logging/ws-logs",
+            "/grpc/**",
     };
 
     @Bean

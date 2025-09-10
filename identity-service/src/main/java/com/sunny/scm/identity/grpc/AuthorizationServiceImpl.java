@@ -1,17 +1,15 @@
 package com.sunny.scm.identity.grpc;
 
-import com.sunny.scm.common.service.RedisService;
-import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.IdentityService;
 import identity.AuthorizationServiceGrpc;
 import identity.AuthorizationServiceOuterClass.CheckPermissionRequest;
 import identity.AuthorizationServiceOuterClass.CheckPermissionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import net.devh.boot.grpc.server.service.GrpcService;
 import io.grpc.stub.StreamObserver;
 
-@Service
+@GrpcService
 @Slf4j
 @RequiredArgsConstructor
 public class AuthorizationServiceImpl extends AuthorizationServiceGrpc.AuthorizationServiceImplBase {

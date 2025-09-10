@@ -13,7 +13,8 @@ public enum GlobalErrorCode implements BaseCodeError {
     UNAUTHENTICATED("99991", "unauthenticated", HttpStatus.UNAUTHORIZED),
     ENDPOINT_API_NOT_FOUND("99992", "endpoint API not found in system", HttpStatus.NOT_FOUND),
     REQUEST_BODY_INVALID("99993", "request body invalid", HttpStatus.BAD_REQUEST),
-    FILE_PROCESSING_ERROR("99994", "file processing error", HttpStatus.INTERNAL_SERVER_ERROR),;
+    FILE_PROCESSING_ERROR("99994", "file processing error", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOT_PERMITTED("99995", "not permitted", HttpStatus.FORBIDDEN),;
 
     String code;
     String message;

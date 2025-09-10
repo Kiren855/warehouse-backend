@@ -38,9 +38,9 @@ public class Product extends BaseEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    @Column(name = "category_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    Long categoryId;
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(name = "length", precision = 10, scale = 2, nullable = false)
     BigDecimal length;

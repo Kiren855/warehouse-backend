@@ -14,5 +14,5 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Permission implements Serializable {
-    Set<String> permissions;
+    String permissions;
 }

@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
                 .code(appException.getBaseCodeError().getCode())
                 .message(appException.getMessage()).build();
 
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.status(appException.getBaseCodeError().getHttpStatus()).body(response);
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
