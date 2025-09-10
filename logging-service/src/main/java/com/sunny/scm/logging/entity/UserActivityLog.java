@@ -2,19 +2,22 @@ package com.sunny.scm.logging.entity;
 
 import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_activity_logs")
+@Table(name = "user_activity_logs",
+        indexes = {
+                @Index(name = "idx_company_creation", columnList = "company_id, created_at DESC")
+        })
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserActivityLog implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +30,9 @@ public class UserActivityLog implements Serializable {
 
     @Column(name = "user_id")
     String userId;
+
+    @Column(name = "username")
+    String username;
 
     @Column(name = "company_id")
     Long companyId;

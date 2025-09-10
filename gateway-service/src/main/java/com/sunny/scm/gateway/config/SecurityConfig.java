@@ -6,9 +6,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.filter.CorsFilter;
+
 
 @Configuration
 @EnableWebFluxSecurity
@@ -18,7 +16,9 @@ public class SecurityConfig {
             "/identity/api/v1/auth/login",
             "/identity/api/v1/auth/refresh",
             "/identity/api/v1/auth/logout",
-            "/internal/**"
+            "/internal/**",
+            "/logging/ws-logs/**",
+            "/logging/ws-logs",
     };
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {

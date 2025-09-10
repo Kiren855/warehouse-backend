@@ -6,13 +6,11 @@ import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.common.service.RedisService;
 import com.sunny.scm.identity.client.KeycloakClient;
-import com.sunny.scm.identity.constant.GrantType;
-import com.sunny.scm.identity.constant.IdentityErrorCode;
-import com.sunny.scm.identity.constant.RealmRoles;
+import com.sunny.scm.identity.constant.*;
 import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
 import com.sunny.scm.identity.entity.User;
-import com.sunny.scm.identity.constant.UserType;
+import com.sunny.scm.identity.event.LoggingProducer;
 import com.sunny.scm.identity.repository.CompanyRepository;
 import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.IdentityService;
@@ -41,6 +39,7 @@ public class IdentityServiceImpl implements IdentityService {
     private final CompanyRepository companyRepository;
     private final KeycloakClient keycloakClient;
     private final RedisService redisService;
+    private final LoggingProducer loggingProducer;
 
     @Value("${keycloak.client-id}")
     String clientId;
@@ -118,13 +117,14 @@ public class IdentityServiceImpl implements IdentityService {
             Jwt jwt = (Jwt) authentication.getPrincipal();
             String userId = authentication.getName();
             String companyId = jwt.getClaimAsString("company_id");
+            String username = request.getUsername();
 
-            userRepository.findByCompanyIdAndUserId(Long.valueOf(companyId), userId).ifPresent(user -> {
+            userRepository.findByCompanyIdAndUsername(Long.valueOf(companyId), username).ifPresent(user -> {
                 throw new AppException(IdentityErrorCode.ACCOUNT_ALREADY_EXISTS);
             });
 
             var userCreationRequest = UserCreationRequest.builder()
-                    .username(request.getUsername())
+                    .username(username)
                     .emailVerified(true)
                     .enabled(true)
                     .attributes(Map.of("company_id", List.of(companyId)))
@@ -153,7 +153,7 @@ public class IdentityServiceImpl implements IdentityService {
 
             User newUser = User.builder()
                     .userId(subUserId)
-                    .username(request.getUsername())
+                    .username(username)
                     .userType(UserType.SUB)
                     .companyId(Long.valueOf(companyId))
                     .isActive(true)
@@ -161,6 +161,9 @@ public class IdentityServiceImpl implements IdentityService {
                     .build();
 
             userRepository.save(newUser);
+            String activity = LogAction.CREATE_USER.format(request.getUsername());
+            loggingProducer.sendMessage(userId, "ROOT",
+                    Long.valueOf(companyId), activity);
 
             return "register sub-user successfully";
         } catch (FeignException e) {
@@ -224,7 +227,12 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void changeSubPassword(String userId, ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String companyId = jwt.getClaimAsString("company_id");
+
         try {
+
             User user = userRepository.findByUserId(userId)
                     .orElseThrow(() -> new AppException(IdentityErrorCode.ACCOUNT_NOT_EXISTS));
 
@@ -241,6 +249,9 @@ public class IdentityServiceImpl implements IdentityService {
                     user.getUserId(),
                     credential
             );
+        String action = LogAction.CHANGE_PASSWORD.format(user.getUsername());
+        loggingProducer.sendMessage(userId, "ROOT",
+                Long.valueOf(companyId), action);
 
         } catch (FeignException e) {
             log.error(e.getMessage());

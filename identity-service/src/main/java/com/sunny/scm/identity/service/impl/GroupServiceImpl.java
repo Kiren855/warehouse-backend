@@ -5,11 +5,13 @@ import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
+import com.sunny.scm.identity.constant.LogAction;
 import com.sunny.scm.identity.dto.auth.UsersResponse;
 import com.sunny.scm.identity.dto.group.*;
 import com.sunny.scm.identity.entity.Group;
 import com.sunny.scm.identity.entity.Role;
 import com.sunny.scm.identity.entity.User;
+import com.sunny.scm.identity.event.LoggingProducer;
 import com.sunny.scm.identity.repository.GroupRepository;
 import com.sunny.scm.identity.repository.RoleRepository;
 import com.sunny.scm.identity.repository.UserRepository;
@@ -38,7 +40,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-
+    private final LoggingProducer loggingProducer;
     @Override
     public GroupResponse getGroup(Long groupId) {
         Group group = groupRepository.findById(groupId)
@@ -144,6 +146,10 @@ public class GroupServiceImpl implements GroupService {
             group.getRoles().addAll(roles);
 
             groupRepository.save(group);
+
+            String action = LogAction.CREATE_GROUP.format(request.getGroupName());
+            loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
+
         } catch (DataIntegrityViolationException e) {
             log.error("Data integrity violation when creating group: {}", e.getMessage());
             throw new AppException(IdentityErrorCode.GROUP_ALREADY_EXISTS);
@@ -152,19 +158,35 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void deleteGroup(Long groupId) {
-        Group group = groupRepository.findById(groupId)
-            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String companyId = jwt.getClaimAsString("company_id");
 
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
         groupRepository.delete(group);
+
+        String action = LogAction.DELETE_GROUP.format(group.getGroupName());
+        loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
     }
 
     @Override
     public void updateGroup(Long groupId, UpdateGroupRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String companyId = jwt.getClaimAsString("company_id");
+
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
         group.setGroupName(request.getGroupName());
         groupRepository.save(group);
+
+        String action = LogAction.UPDATE_GROUP.format(request.getGroupName());
+        log.info("Action: {}", action);
+        loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
     }
 
     @Override
@@ -181,6 +203,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void addRolesInGroup(Long groupId, RolesInGroupRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String companyId = jwt.getClaimAsString("company_id");
+
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
@@ -191,24 +218,42 @@ public class GroupServiceImpl implements GroupService {
 
         group.getRoles().addAll(roles);
         groupRepository.save(group);
+
+        String action = LogAction.ADD_ROLE_IN_GROUP.format(
+                String.valueOf(request.getRoles().size()), group.getGroupName());
+        loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
     }
 
     @Override
     public void addUsersInGroup(Long groupId, UsersInGroupRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String companyId = jwt.getClaimAsString("company_id");
+
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
         Set<User> users = request.getUsers().stream().map(
-                userId -> userRepository.findByUserId(userId)
+                userID -> userRepository.findByUserId(userID)
                         .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND))
         ).collect(java.util.stream.Collectors.toSet());
 
         group.getUsers().addAll(users);
         groupRepository.save(group);
+
+        String action = LogAction.ADD_USER_IN_GROUP.format(
+                String.valueOf(request.getUsers().size()), group.getGroupName());
+        loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
     }
 
     @Override
     public void removeRoleFromGroup(Long groupId, RolesInGroupRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String companyId = jwt.getClaimAsString("company_id");
+
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
@@ -220,22 +265,35 @@ public class GroupServiceImpl implements GroupService {
 
             group.getRoles().removeAll(roles);
             groupRepository.save(group);
+
+            String action = LogAction.REMOVE_ROLE_FROM_GROUP.format(
+                    String.valueOf(request.getRoles().size()), group.getGroupName());
+            loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
         }
     }
 
     @Override
     public void removeUsersFromGroup(Long groupId, UsersInGroupRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String companyId = jwt.getClaimAsString("company_id");
+
         Group group = groupRepository.findById(groupId)
             .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
 
         if(!request.getUsers().isEmpty()) {
             Set<User> users = request.getUsers().stream().map(
-                    userId -> userRepository.findByUserId(userId)
+                    userID -> userRepository.findByUserId(userID)
                             .orElseThrow(() -> new AppException(IdentityErrorCode.USER_NOT_FOUND))
             ).collect(Collectors.toSet());
 
             group.getUsers().removeAll(users);
             groupRepository.save(group);
+
+            String action = LogAction.REMOVE_USER_FROM_GROUP.format(
+                    String.valueOf(request.getUsers().size()), group.getGroupName());
+            loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
         }
     }
 }

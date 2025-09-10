@@ -26,12 +26,13 @@ public class LoggingConsumer {
                 com.sunny.scm.logging.entity.UserActivityLog.builder()
                         .userId(event.getUserId())
                         .companyId(event.getCompanyId())
+                        .username(event.getUsername())
                         .activity(event.getActivity())
                         .creationTimestamp(event.getTimestamp())
                         .build()
         );
 
-        template.convertAndSend("/topic/logs", event);
+        template.convertAndSend("/topic/logs/" + event.getCompanyId(), event);
     }
 
 }
