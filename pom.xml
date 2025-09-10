@@ -18,6 +18,7 @@
         <module>gateway-service</module>
         <module>discoveryserver</module>
         <module>logging-service</module>
+        <module>product-catalog</module>
         <module>common</module>
     </modules>
     <properties>

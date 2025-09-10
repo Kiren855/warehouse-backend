@@ -8,9 +8,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="discoveryserver" />
+        <module name="gateway-service" />
+      </profile>
+      <profile name="Annotation profile for supply-chain-management" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="product-catalog" />
         <module name="common" />
         <module name="identity-service" />
-        <module name="gateway-service" />
         <module name="logging-service" />
       </profile>
     </annotationProcessing>
@@ -22,6 +31,7 @@
       <module name="gateway-service" options="-parameters" />
       <module name="identity-service" options="-parameters" />
       <module name="logging-service" options="-parameters" />
+      <module name="product-catalog" options="-parameters" />
     </option>
   </component>
 </project>
