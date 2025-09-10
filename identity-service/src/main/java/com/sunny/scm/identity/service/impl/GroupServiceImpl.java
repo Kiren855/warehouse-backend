@@ -185,6 +185,7 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.save(group);
 
         String action = LogAction.UPDATE_GROUP.format(request.getGroupName());
+        log.info("Action: {}", action);
         loggingProducer.sendMessage(userId, "ROOT", Long.valueOf(companyId), action);
     }
 

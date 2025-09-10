@@ -27,5 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findAllByCompanyIdAndUserType(Long companyId, UserType userType, Pageable pageable);
 
-    Optional<User> findByCompanyIdAndUserId(Long companyId, String userId);
+    Optional<User> findByCompanyIdAndUsername(Long companyId, String username);
 }
