@@ -14,7 +14,8 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products",
     uniqueConstraints = {
-            @UniqueConstraint(columnNames = {"company_id", "product_sku"})
+            @UniqueConstraint(columnNames = {"company_id", "product_sku"}),
+            @UniqueConstraint(columnNames = {"company_id", "barcode"})
     },
     indexes = {
         @Index(name = "idx_products_company_id", columnList = "company_id"),
@@ -49,7 +50,7 @@ public class Product extends BaseEntity {
     @Column(name = "weight", precision = 10, scale = 2, nullable = false)
     private BigDecimal weight;
 
-    @Column(name = "barcode", unique = true)
+    @Column(name = "barcode")
     private String barcode;
     @Column(name = "unit", nullable = false)
     private String unit;
