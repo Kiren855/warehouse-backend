@@ -15,12 +15,38 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-    @CheckPermission(permission = {"CREATE_PRODUCT", ""})
+    @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "CREATE_PRODUCT", "ALL_PERMISSIONS"})
     @PostMapping()
     public ResponseEntity<ApiResponse<?>> createProduct(
         @Valid @RequestBody ProductRequest request) {
         productService.createProduct(request);
         ProductSuccessCode code = ProductSuccessCode.CREATE_PRODUCT_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage()).build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
+    @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "UPDATE_PRODUCT", "ALL_PERMISSIONS"})
+    @PatchMapping("/{productId}")
+    public ResponseEntity<?> updateProduct(
+        @PathVariable Long productId,
+        @Valid @RequestBody ProductRequest request) {
+        productService.updateProduct(productId, request);
+        ProductSuccessCode code = ProductSuccessCode.UPDATE_PRODUCT_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage()).build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
+    @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "DELETE_PRODUCT", "ALL_PERMISSIONS"})
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        ProductSuccessCode code = ProductSuccessCode.DELETE_PRODUCT_SUCCESS;
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(code.getCode())
                 .message(code.getMessage()).build();
