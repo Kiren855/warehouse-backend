@@ -3,7 +3,7 @@ package com.sunny.scm.product.controller;
 import com.sunny.scm.grpc_common.aop.CheckPermission;
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.product.constant.ProductSuccessCode;
-import com.sunny.scm.product.dto.product.CreateProductRequest;
+import com.sunny.scm.product.dto.product.ProductRequest;
 import com.sunny.scm.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class ProductController {
     @CheckPermission(permission = {"CREATE_PRODUCT", ""})
     @PostMapping()
     public ResponseEntity<ApiResponse<?>> createProduct(
-        @Valid @RequestBody CreateProductRequest request) {
+        @Valid @RequestBody ProductRequest request) {
         productService.createProduct(request);
         ProductSuccessCode code = ProductSuccessCode.CREATE_PRODUCT_SUCCESS;
         ApiResponse<?> apiResponse = ApiResponse.builder()

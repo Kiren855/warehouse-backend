@@ -3,7 +3,6 @@ package com.sunny.scm.product.dto.product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class CreateProductRequest {
+public class ProductRequest {
     @JsonProperty("product_name")
     @NotBlank(message = "Product name is required")
     String productName;
