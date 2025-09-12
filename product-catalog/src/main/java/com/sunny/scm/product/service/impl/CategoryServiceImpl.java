@@ -8,6 +8,7 @@ import com.sunny.scm.product.dto.category.CreateCategoryRequest;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.event.LoggingProducer;
 import com.sunny.scm.product.repository.CategoryRepository;
+import com.sunny.scm.product.repository.ProductRepository;
 import com.sunny.scm.product.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
     private final LoggingProducer loggingProducer;
     @Override
     public void createCategory(CreateCategoryRequest request) {
@@ -33,7 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category newCategory = Category.builder()
                 .companyId(Long.valueOf(companyId))
                 .categoryName(request.getCategoryName())
-                .description(request.getDescription())
                 .build();
 
         if(request.getParentId() != null) {
@@ -46,6 +47,33 @@ public class CategoryServiceImpl implements CategoryService {
 
         //logging
         String action = LogAction.CREATE_CATEGORY.format(request.getCategoryName());
+        loggingProducer.sendMessage(userId, username, Long.valueOf(companyId), action);
+    }
+
+    @Override
+    public void deleteCategory(Long categoryId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String username = jwt.getClaimAsString("preferred_username");
+        String companyId = jwt.getClaimAsString("company_id");
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new AppException(ProductErrorCode.CATEGORY_NOT_EXIST));
+        // check if category has products
+        long count = productRepository.countByCategory(category);
+        if(count > 0) {
+            throw new AppException(ProductErrorCode.CATEGORY_HAS_PRODUCTS);
+        }
+
+        if (!category.getChildCategories().isEmpty()) {
+            throw new AppException(ProductErrorCode.CATEGORY_HAS_CHILDREN);
+        }
+
+        categoryRepository.delete(category);
+
+        //logging
+        String action = LogAction.DELETE_CATEGORY.format(category.getCategoryName());
         loggingProducer.sendMessage(userId, username, Long.valueOf(companyId), action);
     }
 }

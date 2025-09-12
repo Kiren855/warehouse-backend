@@ -4,7 +4,9 @@ import com.sunny.scm.common.base.BaseCodeError;
 import org.springframework.http.HttpStatus;
 
 public enum ProductErrorCode implements BaseCodeError {
-    CATEGORY_NOT_EXIST("E20001", "Category not exist", HttpStatus.BAD_REQUEST),;
+    CATEGORY_NOT_EXIST("E20001", "Category not exist", HttpStatus.BAD_REQUEST),
+    CATEGORY_HAS_PRODUCTS("E20002", "Category has products, cannot delete", HttpStatus.BAD_REQUEST),
+    CATEGORY_HAS_CHILDREN("E20003", "Category has child categories, cannot delete", HttpStatus.BAD_REQUEST),;
     String code;
     String message;
     HttpStatus httpStatus;

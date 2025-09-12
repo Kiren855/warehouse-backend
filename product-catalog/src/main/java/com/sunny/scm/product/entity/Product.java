@@ -19,8 +19,6 @@ import java.math.BigDecimal;
     indexes = {
         @Index(name = "idx_products_company_id", columnList = "company_id"),
         @Index(name = "idx_products_category_id", columnList = "category_id"),
-        @Index(name = "idx_products_sku", columnList = "product_sku"),
-        @Index(name = "idx_products_name", columnList = "product_name")
     }
 )
 @NoArgsConstructor
@@ -30,35 +28,40 @@ import java.math.BigDecimal;
 public class Product extends BaseEntity {
 
     @Column(name = "company_id", nullable = false)
-    Long companyId;
-    @Column(name = "product_sku", nullable = false, unique = true)
-    String productSku;
+    private Long companyId;
+    @Column(name = "product_sku", nullable = false)
+    private String productSku;
     @Column(name = "product_name", nullable = false)
-    String productName;
+    private String productName;
     @Column(name = "description", columnDefinition = "TEXT")
-    String description;
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @Column(name = "length", precision = 10, scale = 2, nullable = false)
-    BigDecimal length;
-    @Column(name = "height", precision = 10, scale = 2, nullable = false)
-    BigDecimal width;
+    private BigDecimal length;
     @Column(name = "width", precision = 10, scale = 2, nullable = false)
-    BigDecimal height;
+    private BigDecimal width;
+    @Column(name = "height", precision = 10, scale = 2, nullable = false)
+    private BigDecimal height;
     @Column(name = "weight", precision = 10, scale = 2, nullable = false)
-    BigDecimal weight;
-    @Column(name = "volume", precision = 14, scale = 2, nullable = false)
-    BigDecimal volume;
+    private BigDecimal weight;
 
     @Column(name = "barcode", unique = true)
-    String barcode;
+    private String barcode;
     @Column(name = "unit", nullable = false)
-    String unit;
+    private String unit;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    ProductStatus status;
+    private ProductStatus status;
 
+    @Transient
+    public BigDecimal getVolume() {
+        if (this.length != null && this.width != null && this.height != null) {
+            return this.length.multiply(this.width).multiply(this.height);
+        }
+        return BigDecimal.ZERO;
+    }
 }
