@@ -14,6 +14,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -25,10 +26,15 @@ import java.time.Duration;
 public class IdentityController {
     private final IdentityService identityRootService;
 
-    @GetMapping("/hello")
+    @GetMapping("/check")
     public ResponseEntity<ApiResponse<?>> hello() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String companyId = jwt.getClaimAsString("company_id");
+
         ApiResponse<?> apiResponse = ApiResponse.builder()
-                .message("Hello World").build();
+                .message("AC")
+                .result(authentication.getAuthorities()).build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }

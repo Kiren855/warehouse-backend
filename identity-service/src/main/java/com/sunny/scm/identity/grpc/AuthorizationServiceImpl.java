@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import io.grpc.stub.StreamObserver;
 
+import java.util.List;
+
 @GrpcService
 @Slf4j
 @RequiredArgsConstructor
@@ -19,9 +21,9 @@ public class AuthorizationServiceImpl extends AuthorizationServiceGrpc.Authoriza
                                 StreamObserver<CheckPermissionResponse> responseObserver) {
 
         String userId = request.getUserId();
-        String roleName = request.getRole();
+        List<String> roleNames = request.getRolesList();
 
-        boolean allowed = identityService.checkPermission(userId, roleName);
+        boolean allowed = identityService.checkPermission(userId, roleNames);
 
         CheckPermissionResponse response = CheckPermissionResponse.newBuilder()
                 .setAllowed(allowed)

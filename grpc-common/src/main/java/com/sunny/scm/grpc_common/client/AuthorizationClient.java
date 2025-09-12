@@ -17,10 +17,10 @@ public class AuthorizationClient {
         this.authStub = authStub;
     }
 
-    public boolean checkPermission(String userId, String permission) {
+    public boolean checkPermission(String userId, String[] permission) {
         CheckPermissionRequest request = CheckPermissionRequest.newBuilder()
                 .setUserId(userId)
-                .setRole(permission)
+                .addAllRoles(java.util.Arrays.asList(permission))
                 .build();
 
         CheckPermissionResponse response = authStub.checkPermission(request);

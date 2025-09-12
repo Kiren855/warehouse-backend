@@ -8,8 +8,7 @@ service AuthorizationService {
 
 message CheckPermissionRequest {
   string user_id = 1;
-  string role = 2;
-  string resource = 3;
+  repeated string roles = 5;
 }
 
 message CheckPermissionResponse {

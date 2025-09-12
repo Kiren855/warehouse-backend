@@ -28,9 +28,15 @@ public class AuthorizationAspect {
         if (authentication == null) {
             throw new AppException(GlobalErrorCode.UNAUTHENTICATED);
         }
+        boolean hasRoot = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> "ROLE_ROOT".equals(grantedAuthority.getAuthority()));
+
+        if (hasRoot) {
+            return;
+        }
 
         String userId = authentication.getName();
-        String permission = checkPermission.permission();
+        String[] permission = checkPermission.permission();
 
         boolean allowed = authClient.checkPermission(userId, permission);
         if (!allowed) {

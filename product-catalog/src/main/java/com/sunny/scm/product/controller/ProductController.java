@@ -2,24 +2,31 @@ package com.sunny.scm.product.controller;
 
 import com.sunny.scm.grpc_common.aop.CheckPermission;
 import com.sunny.scm.common.dto.ApiResponse;
+import com.sunny.scm.product.constant.ProductSuccessCode;
+import com.sunny.scm.product.dto.product.CreateProductRequest;
+import com.sunny.scm.product.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/product/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
+    private final ProductService productService;
+    @CheckPermission(permission = {"CREATE_PRODUCT", ""})
+    @PostMapping()
+    public ResponseEntity<ApiResponse<?>> createProduct(
+        @Valid @RequestBody CreateProductRequest request) {
+        productService.createProduct(request);
+        ProductSuccessCode code = ProductSuccessCode.CREATE_PRODUCT_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage()).build();
 
-    @CheckPermission(permission = "ALL_PERMI")
-    @GetMapping()
-    public ResponseEntity<?> testRole() {
-
-        return ResponseEntity.ok(ApiResponse.builder()
-                .code("100000")
-                .message("can use this api")
-                .build());
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
+
+
 }

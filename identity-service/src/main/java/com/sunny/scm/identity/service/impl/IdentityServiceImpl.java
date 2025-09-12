@@ -328,9 +328,11 @@ public class IdentityServiceImpl implements IdentityService {
                         .build())
                 .collect(Collectors.toList());
     }
-    public boolean checkPermission(String userId, String roleName) {
+    public boolean checkPermission(String userId, List<String> roleNames) {
         List<Permission> permissions = getUserPermissions(userId);
+
         return permissions.stream()
-                .anyMatch(p -> roleName.equals(p.getPermissions()));
+                .map(Permission::getPermissions)
+                .anyMatch(roleNames::contains);
     }
 }
