@@ -1,11 +1,9 @@
-package com.sunny.scm.common.aop;
+package com.sunny.scm.grpc_common.aop;
 
-import com.sunny.scm.common.client.AuthorizationClient;
+import com.sunny.scm.grpc_common.client.AuthorizationClient;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.websocket.AuthenticationException;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;

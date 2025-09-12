@@ -46,16 +46,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(value = "user-roles", key = "#userId", unless = "#result == null || #result.isEmpty()", cacheManager = "cacheManager")
     public List<RoleResponse> getUserRoles(String userId) {
-        try {
-            return userRepository.findRolesByUserId(userId).stream()
-                    .map(role -> RoleResponse.builder()
-                            .roleName(role.getRoleName())
-                            .build())
-                    .toList();
-        } catch (Exception e) {
-            e.printStackTrace(); // in ra lỗi thật
-            throw e;
-        }
+        return userRepository.findRolesByUserId(userId).stream()
+                .map(role -> RoleResponse.builder()
+                        .roleName(role.getRoleName())
+                        .build())
+                .toList();
     }
 
 }

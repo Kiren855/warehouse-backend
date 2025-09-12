@@ -1,4 +1,4 @@
-package com.sunny.scm.common.aop;
+package com.sunny.scm.grpc_common.aop;
 
 import java.lang.annotation.*;
 

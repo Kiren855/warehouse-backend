@@ -1,18 +1,14 @@
 package com.sunny.scm.identity.service.impl;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.Permission;
-import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
-import com.sunny.scm.common.service.RedisService;
 import com.sunny.scm.identity.client.KeycloakClient;
 import com.sunny.scm.identity.constant.*;
 import com.sunny.scm.identity.dto.auth.*;
 import com.sunny.scm.identity.entity.Company;
-import com.sunny.scm.identity.entity.Role;
 import com.sunny.scm.identity.entity.User;
 import com.sunny.scm.identity.event.LoggingProducer;
 import com.sunny.scm.identity.repository.CompanyRepository;
@@ -34,8 +30,6 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +40,6 @@ public class IdentityServiceImpl implements IdentityService {
     private final CompanyRepository companyRepository;
     private final KeycloakClient keycloakClient;
     private final LoggingProducer loggingProducer;
-    private ObjectMapper objectMapper;
     @Value("${keycloak.client-id}")
     String clientId;
 

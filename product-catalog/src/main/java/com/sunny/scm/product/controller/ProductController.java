@@ -1,6 +1,6 @@
 package com.sunny.scm.product.controller;
 
-import com.sunny.scm.common.aop.CheckPermission;
+import com.sunny.scm.grpc_common.aop.CheckPermission;
 import com.sunny.scm.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

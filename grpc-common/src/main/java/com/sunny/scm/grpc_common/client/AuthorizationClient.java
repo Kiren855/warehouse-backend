@@ -1,4 +1,4 @@
-package com.sunny.scm.common.client;
+package com.sunny.scm.grpc_common.client;
 
 import identity.AuthorizationServiceGrpc;
 import identity.AuthorizationServiceOuterClass.CheckPermissionRequest;
@@ -6,6 +6,7 @@ import identity.AuthorizationServiceOuterClass.CheckPermissionResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
