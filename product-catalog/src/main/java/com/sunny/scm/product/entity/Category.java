@@ -9,17 +9,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
+@Table(name = "categories",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"company_id", "category_name"})
+        }
+)
 public class Category extends BaseEntity {
     @Column(name = "company_id", nullable = false)
     Long companyId;
 
-    @Column(name = "category_name", nullable = false, unique = true)
+    @Column(name = "category_name", nullable = false)
     String categoryName;
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
