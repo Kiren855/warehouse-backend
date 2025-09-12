@@ -11,7 +11,11 @@ public enum ProductSuccessCode implements BaseCodeError {
     UPDATE_CATEGORY_SUCCESS("S20003", "Update category success", HttpStatus.OK),
     DELETE_CATEGORY_SUCCESS("S20004", "Delete category success", HttpStatus.OK),
 
-    ;String code;
+    GET_PRODUCT_DETAIL_SUCCESS("S20007", "Get product detail success", HttpStatus.OK),
+    CREATE_PACKAGE_SUCCESS("S20008", "Create package success", HttpStatus.OK),
+    DELETE_PACKAGE_SUCCESS("S20009", "Delete package success", HttpStatus.OK),
+    UPDATE_PACKAGE_SUCCESS("S20010", "Update package success", HttpStatus.OK),;
+    String code;
     String message;
     HttpStatus httpStatus;
     ProductSuccessCode(String code, String message, HttpStatus httpStatus) {

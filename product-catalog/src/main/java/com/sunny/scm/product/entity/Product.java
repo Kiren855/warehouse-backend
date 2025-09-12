@@ -7,6 +7,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "products",
@@ -40,28 +42,12 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(name = "length", precision = 10, scale = 2, nullable = false)
-    private BigDecimal length;
-    @Column(name = "width", precision = 10, scale = 2, nullable = false)
-    private BigDecimal width;
-    @Column(name = "height", precision = 10, scale = 2, nullable = false)
-    private BigDecimal height;
-    @Column(name = "weight", precision = 10, scale = 2, nullable = false)
-    private BigDecimal weight;
-
-    @Column(name = "barcode")
-    private String barcode;
     @Column(name = "unit", nullable = false)
     private String unit;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ProductStatus status;
 
-    @Transient
-    public BigDecimal getVolume() {
-        if (this.length != null && this.width != null && this.height != null) {
-            return this.length.multiply(this.width).multiply(this.height);
-        }
-        return BigDecimal.ZERO;
-    }
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductPackage> packages = new HashSet<>();
 }

@@ -3,9 +3,9 @@ package com.sunny.scm.product.service.impl;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.ProductErrorCode;
-import com.sunny.scm.product.constant.ProductStatus;
 import com.sunny.scm.product.dto.product.ProductDetailResponse;
-import com.sunny.scm.product.dto.product.ProductRequest;
+import com.sunny.scm.product.dto.product.CreateProductRequest;
+import com.sunny.scm.product.dto.product.UpdateProductRequest;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
 import com.sunny.scm.product.event.LoggingProducer;
@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final LoggingProducer loggingProducer;
     private final CategoryService categoryService;
     @Override
-    public void createProduct(ProductRequest request) {
+    public void createProduct(CreateProductRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String StringCompanyId = jwt.getClaimAsString("company_id");
@@ -47,9 +48,11 @@ public class ProductServiceImpl implements ProductService {
 
         String sku = skuSequenceService.generateSku(companyId);
 
-        Product newProduct = ProductRequest.toEntity(request);
+        Product newProduct = CreateProductRequest.toEntity(request);
+        newProduct.setCompanyId(companyId);
         newProduct.setCategory(category);
         newProduct.setProductSku(sku);
+        newProduct.setPackages(new HashSet<>());
 
         productRepository.save(newProduct);
         String action = LogAction.CREATE_PRODUCT.format(newProduct.getProductSku());
@@ -58,30 +61,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @CachePut(value = "product_details", key = "#productId")
-    public void updateProduct(Long productId, ProductRequest request) {
+    public void updateProduct(Long productId, UpdateProductRequest request) {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.PRODUCT_NOT_EXIST));
 
         if (request.getProductName() != null) {
             existingProduct.setProductName(request.getProductName().trim());
         }
-        if (request.getLength() != null) {
-            existingProduct.setLength(request.getLength());
-        }
-        if (request.getWidth() != null) {
-            existingProduct.setWidth(request.getWidth());
-        }
-        if (request.getHeight() != null) {
-            existingProduct.setHeight(request.getHeight());
-        }
-        if (request.getWeight() != null) {
-            existingProduct.setWeight(request.getWeight());
-        }
+
         if (request.getUnit() != null) {
             existingProduct.setUnit(request.getUnit().trim());
-        }
-        if (request.getBarcode() != null) {
-            existingProduct.setBarcode(request.getBarcode().trim());
         }
 
         if (request.getCategoryId() != null) {

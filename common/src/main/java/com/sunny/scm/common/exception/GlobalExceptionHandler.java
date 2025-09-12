@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse<?>> handlingException(Exception exception) {
+    ResponseEntity<?> handlingException(Exception exception) {
         ApiResponse<?> response = ApiResponse.builder()
                 .code(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
                 .message(GlobalErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = IOException.class)
-    ResponseEntity<ApiResponse<?>> handlingIOException(IOException exception) {
+    ResponseEntity<?> handlingIOException(IOException exception) {
         ApiResponse<?> response = ApiResponse.builder()
                 .code(GlobalErrorCode.FILE_PROCESSING_ERROR.getCode())
                 .message(GlobalErrorCode.FILE_PROCESSING_ERROR.getMessage())
@@ -41,7 +42,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = NoResourceFoundException.class)
-    ResponseEntity<ApiResponse<?>> handlingNoResourceException(NoResourceFoundException exception) {
+    ResponseEntity<?> handlingNoResourceException(NoResourceFoundException exception) {
         ApiResponse<?> response = ApiResponse.builder()
                 .code(GlobalErrorCode.ENDPOINT_API_NOT_FOUND.getCode())
                 .message(GlobalErrorCode.ENDPOINT_API_NOT_FOUND.getMessage())
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = AppException.class)
-    ResponseEntity<ApiResponse<?>> handlingAppException(AppException appException) {
+    ResponseEntity<?> handlingAppException(AppException appException) {
         ApiResponse<?> response = ApiResponse.builder()
                 .code(appException.getBaseCodeError().getCode())
                 .message(appException.getMessage()).build();
@@ -60,7 +61,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
-    ResponseEntity<ApiResponse<?>> handlingAccessDeniedException(AccessDeniedException exception) {
+    ResponseEntity<?> handlingAccessDeniedException(AccessDeniedException exception) {
         GlobalErrorCode globalErrorCode = GlobalErrorCode.UNCATEGORIZED_EXCEPTION;
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -71,7 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    ResponseEntity<ApiResponse<?>> handlingValidation(MethodArgumentNotValidException exception) {
+    ResponseEntity<?> handlingValidation(MethodArgumentNotValidException exception) {
         FieldError fieldError = exception.getBindingResult().getFieldError();
         String message = fieldError.getDefaultMessage();
         GlobalErrorCode errorCode = GlobalErrorCode.REQUEST_BODY_INVALID;
@@ -82,5 +83,17 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    ResponseEntity<?> handlingMethodNotSupported(HttpRequestMethodNotSupportedException exception) {
+        GlobalErrorCode errorCode = GlobalErrorCode.METHOD_NOT_ALLOWED;
+
+        ApiResponse<?> response = ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
     }
 }

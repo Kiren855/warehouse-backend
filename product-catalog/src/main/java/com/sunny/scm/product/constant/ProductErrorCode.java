@@ -9,7 +9,8 @@ public enum ProductErrorCode implements BaseCodeError {
     CATEGORY_HAS_CHILDREN("E20003", "Category has child categories, cannot delete", HttpStatus.BAD_REQUEST),
     CATEGORY_ALREADY_EXISTS("E20004", "Category already exists", HttpStatus.BAD_REQUEST),
     PRODUCT_ALREADY_EXISTS("E20005", "Product already exists", HttpStatus.BAD_REQUEST),
-    PRODUCT_NOT_EXIST("E20006", "Product not exist", HttpStatus.BAD_REQUEST),;
+    PRODUCT_NOT_EXIST("E20006", "Product not exist", HttpStatus.BAD_REQUEST),
+    PACKAGE_NOT_EXIST("E20007", "Package not exist", HttpStatus.BAD_REQUEST),;
     String code;
     String message;
     HttpStatus httpStatus;
