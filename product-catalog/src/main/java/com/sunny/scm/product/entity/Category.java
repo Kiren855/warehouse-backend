@@ -14,16 +14,10 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
-@Table(name = "categories",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"company_id", "category_name"})
-        }
-)
+@Table(name = "categories")
 public class Category extends BaseEntity {
-    @Column(name = "company_id", nullable = false)
-    Long companyId;
 
-    @Column(name = "category_name", nullable = false)
+    @Column(name = "category_name", nullable = false, unique = true)
     String categoryName;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -26,14 +26,12 @@ public class CategoryServiceImpl implements CategoryService {
     private final LoggingProducer loggingProducer;
     @Override
     public void createCategory(CreateCategoryRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = authentication.getName();
-        String username = jwt.getClaimAsString("preferred_username");
-        String companyId = jwt.getClaimAsString("company_id");
+        categoryRepository.findByCategoryName(request.getCategoryName())
+                .ifPresent(c -> {
+                    throw new AppException(ProductErrorCode.CATEGORY_ALREADY_EXISTS);
+                });
 
         Category newCategory = Category.builder()
-                .companyId(Long.valueOf(companyId))
                 .categoryName(request.getCategoryName())
                 .build();
 
@@ -44,10 +42,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryRepository.save(newCategory);
-
-        //logging
-        String action = LogAction.CREATE_CATEGORY.format(request.getCategoryName());
-        loggingProducer.sendMessage(userId, username, Long.valueOf(companyId), action);
     }
 
     @Override
