@@ -17,6 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -59,9 +63,19 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryRepository.delete(category);
+    }
 
-        //logging
-        String action = LogAction.DELETE_CATEGORY.format(category.getCategoryName());
-        loggingProducer.sendMessage(action);
+    public List<String> getCategoryPath(Long leafCategoryId) {
+        List<String> path = new ArrayList<>();
+
+        Category currentCategory = categoryRepository.findById(leafCategoryId).orElse(null);
+
+        while (currentCategory != null) {
+            path.add(currentCategory.getCategoryName());
+            currentCategory = currentCategory.getParentCategory();
+        }
+
+        Collections.reverse(path);
+        return path;
     }
 }
