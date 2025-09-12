@@ -46,12 +46,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long categoryId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userId = authentication.getName();
-        String username = jwt.getClaimAsString("preferred_username");
-        String companyId = jwt.getClaimAsString("company_id");
-
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.CATEGORY_NOT_EXIST));
         // check if category has products
@@ -68,6 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         //logging
         String action = LogAction.DELETE_CATEGORY.format(category.getCategoryName());
-        loggingProducer.sendMessage(userId, username, Long.valueOf(companyId), action);
+        loggingProducer.sendMessage(action);
     }
 }

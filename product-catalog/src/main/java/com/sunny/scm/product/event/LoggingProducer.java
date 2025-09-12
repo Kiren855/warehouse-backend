@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,7 +21,14 @@ public class LoggingProducer {
     @Value("${spring.kafka.topic.user-activity}")
     private String topicName;
 
-    public void sendMessage(String userId, String username, Long companyId, String activity) {
+    public void sendMessage(String activity) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = authentication.getName();
+        String username = jwt.getClaimAsString("preferred_username");
+        String StringCompanyId = jwt.getClaimAsString("company_id");
+        long companyId = Long.parseLong(StringCompanyId);
+
         LoggingEvent event = LoggingEvent.builder()
                 .userId(userId)
                 .username(username)

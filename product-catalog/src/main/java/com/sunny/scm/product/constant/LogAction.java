@@ -7,10 +7,12 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum LogAction {
-    CREATE_GROUP("Create group with name %s"),
     CREATE_CATEGORY("Create category with name %s"),
     UPDATE_CATEGORY("Update category with name %s to %s"),
     DELETE_CATEGORY("Delete category with name %s"),
+    CREATE_PRODUCT("Create product with SKU: %s"),
+    UPDATE_PRODUCT("Update product with SKU: %s"),
+    DELETE_PRODUCT("Delete product with SKU: %s"),
 ;
     String value;
     LogAction(String value) {

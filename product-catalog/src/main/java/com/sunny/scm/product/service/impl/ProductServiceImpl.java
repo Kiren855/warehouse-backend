@@ -1,11 +1,13 @@
 package com.sunny.scm.product.service.impl;
 
 import com.sunny.scm.common.exception.AppException;
+import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.ProductErrorCode;
 import com.sunny.scm.product.constant.ProductStatus;
 import com.sunny.scm.product.dto.product.CreateProductRequest;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
+import com.sunny.scm.product.event.LoggingProducer;
 import com.sunny.scm.product.repository.CategoryRepository;
 import com.sunny.scm.product.repository.ProductRepository;
 import com.sunny.scm.product.repository.SkuSequenceRepository;
@@ -26,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final SkuSequenceService skuSequenceService;
+    private final LoggingProducer loggingProducer;
     @Override
     public void createProduct(CreateProductRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -49,6 +52,11 @@ public class ProductServiceImpl implements ProductService {
                 .weight(request.getWeight())
                 .unit(request.getUnit())
                 .status(ProductStatus.INACTIVE)
+                .barcode(request.getBarcode())
                 .build();
+
+        productRepository.save(newProduct);
+        String action = LogAction.CREATE_PRODUCT.format(newProduct.getProductSku());
+        loggingProducer.sendMessage(action);
     }
 }
