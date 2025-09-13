@@ -19,20 +19,20 @@ import java.math.BigDecimal;
 public class ProductPackage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    Product product;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "package_type", nullable = false)
-    private PackageType packageType; // e.g., SINGLE, BOX, CARTON, PALLET
+    PackageType packageType; // e.g., SINGLE, BOX, CARTON, PALLET
 
     @Column(name = "length", precision = 10, scale = 2, nullable = false)
-    private BigDecimal length;
+    BigDecimal length;
     @Column(name = "width", precision = 10, scale = 2, nullable = false)
-    private BigDecimal width;
+    BigDecimal width;
     @Column(name = "height", precision = 10, scale = 2, nullable = false)
-    private BigDecimal height;
+    BigDecimal height;
     @Column(name = "weight", precision = 10, scale = 2, nullable = false)
-    private BigDecimal weight;
+    BigDecimal weight;
 
     @Column(name = "barcode")
     private String barcode;

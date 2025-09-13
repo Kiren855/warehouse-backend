@@ -1,9 +1,9 @@
 package com.sunny.scm.product.service.impl;
 
-import com.sunny.scm.common.event.LoggingEvent;
+
 import com.sunny.scm.common.exception.AppException;
-import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.ProductErrorCode;
+import com.sunny.scm.product.dto.category.CategoryResponse;
 import com.sunny.scm.product.dto.category.CreateCategoryRequest;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.event.LoggingProducer;
@@ -77,5 +77,29 @@ public class CategoryServiceImpl implements CategoryService {
 
         Collections.reverse(path);
         return path;
+    }
+
+    @Override
+    public List<CategoryResponse> getRootCategories() {
+        return categoryRepository
+            .findByParentCategoryIsNull()
+            .stream()
+            .map(category -> CategoryResponse
+                .builder()
+                    .id(category.getId())
+                    .categoryName(category.getCategoryName())
+                    .build()).toList();
+    }
+
+    @Override
+    public List<CategoryResponse> getChildCategories(Long parentId) {
+        return categoryRepository
+        .findByParentCategoryId(parentId)
+        .stream()
+        .map(category -> CategoryResponse
+            .builder()
+                .id(category.getId())
+                .categoryName(category.getCategoryName())
+                .build()).toList();
     }
 }

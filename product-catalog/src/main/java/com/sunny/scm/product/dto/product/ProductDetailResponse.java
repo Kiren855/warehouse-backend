@@ -26,11 +26,6 @@ public class ProductDetailResponse {
     @JsonProperty("category_names")
     List<String> categoryNames;
     String unit;
-    String barcode;
-    BigDecimal length;
-    BigDecimal width;
-    BigDecimal height;
-    BigDecimal weight;
     String status;
 
     public static ProductDetailResponse fromEntity(Product product, List<String> categoryNames) {
@@ -41,6 +36,7 @@ public class ProductDetailResponse {
                 .description(product.getDescription())
                 .productSku(product.getProductSku())
                 .status(product.getStatus().name())
+                .unit(product.getUnit())
                 .categoryNames(categoryNames)
                 .build();
     }

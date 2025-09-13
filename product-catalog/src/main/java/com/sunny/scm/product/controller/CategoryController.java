@@ -8,10 +8,7 @@ import com.sunny.scm.product.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/product/api/v1/categories")
@@ -28,6 +25,34 @@ public class CategoryController {
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(code.getCode())
                 .message(code.getMessage())
+                .build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
+    @GetMapping("/root")
+    public ResponseEntity<?> getRootCategories() {
+        var categories = categoryService.getRootCategories();
+        ProductSuccessCode code = ProductSuccessCode.GET_ROOT_CATEGORIES_SUCCESS;
+
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .result(categories)
+                .build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
+    @GetMapping("/{parentId}/children")
+    public ResponseEntity<?> getChildCategories(@PathVariable Long parentId) {
+        var categories = categoryService.getChildCategories(parentId);
+        ProductSuccessCode code = ProductSuccessCode.GET_CATEGORY_TREE_SUCCESS;
+
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .result(categories)
                 .build();
 
         return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
