@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     long countByCategory(Category category);
     Page<Product> findAllByCompanyId(Long companyId, Pageable pageable);
+
 }

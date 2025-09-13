@@ -1,11 +1,14 @@
 package com.sunny.scm.product.service.impl;
 
+import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.PackageType;
 import com.sunny.scm.product.constant.ProductErrorCode;
 import com.sunny.scm.product.dto.product.CreatePackageRequest;
+import com.sunny.scm.product.dto.product.PackageResponse;
 import com.sunny.scm.product.dto.product.UpdatePackageRequest;
+import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
 import com.sunny.scm.product.entity.ProductPackage;
 import com.sunny.scm.product.event.LoggingProducer;
@@ -16,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -93,5 +98,23 @@ public class PackageServiceImpl implements PackageService {
         packageRepository.delete(productPackage);
         String action = LogAction.REMOVE_PRODUCT_PACKAGE.format(productPackage.getPackageType(), product.getProductSku());
         loggingProducer.sendMessage(action);
+    }
+
+    @Override
+    public PageResponse<PackageResponse> getPackages(Long productId, int page, int size) {
+        Page<PackageResponse> packages = packageRepository
+            .findAllByProductId(productId, PageRequest.of(page, size))
+                .map(productPackage -> PackageResponse.builder()
+                        .id(productPackage.getId())
+                        .packageType(productPackage.getPackageType().name())
+                        .width(productPackage.getWidth())
+                        .length(productPackage.getLength())
+                        .height(productPackage.getHeight())
+                        .weight(productPackage.getWeight())
+                        .barcode(productPackage.getBarcode())
+                        .quantityInParent(productPackage.getQuantityInParent())
+                        .build());
+
+        return PageResponse.from(packages);
     }
 }

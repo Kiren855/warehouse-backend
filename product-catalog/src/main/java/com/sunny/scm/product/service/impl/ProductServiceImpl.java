@@ -22,6 +22,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -115,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
 
         Page<ProductResponse> products = productRepository.findAllByCompanyId(
                 Long.valueOf(companyId),
-                org.springframework.data.domain.PageRequest.of(page, size)
+                PageRequest.of(page, size)
         ).map(product -> ProductResponse.builder()
                 .id(product.getId())
                 .productSku(product.getProductSku())

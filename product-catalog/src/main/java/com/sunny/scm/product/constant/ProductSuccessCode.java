@@ -18,7 +18,8 @@ public enum ProductSuccessCode implements BaseCodeError {
     GET_PRODUCTS_SUCCESS("S20011", "Get products success", HttpStatus.OK),
     GET_CATEGORIES_SUCCESS("S20012", "Get categories success", HttpStatus.OK),
     GET_ROOT_CATEGORIES_SUCCESS("S20013", "Get root categories success", HttpStatus.OK),
-    GET_CATEGORY_TREE_SUCCESS("S20014", "Get category tree success", HttpStatus.OK),;
+    GET_CATEGORY_TREE_SUCCESS("S20014", "Get category tree success", HttpStatus.OK),
+    GET_PACKAGES_SUCCESS("S20015", "Get packages success", HttpStatus.OK);
     String code;
     String message;
     HttpStatus httpStatus;

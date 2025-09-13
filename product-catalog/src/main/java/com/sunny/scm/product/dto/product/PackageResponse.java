@@ -16,8 +16,6 @@ import java.math.BigDecimal;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class PackageResponse {
     Long id;
-    @JsonProperty("package_name")
-    String packageName;
     @JsonProperty("package_type")
     String packageType;
 

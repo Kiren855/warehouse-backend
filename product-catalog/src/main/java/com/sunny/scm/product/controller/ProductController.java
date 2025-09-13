@@ -136,4 +136,22 @@ public class ProductController {
 
         return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
+
+    @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "VIEW_PRODUCT", "ALL_PERMISSIONS"})
+    @GetMapping("/{productId}/packages")
+    public ResponseEntity<?> getPackages(
+        @PathVariable Long productId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+
+        var packages = packageService.getPackages(productId, page, size);
+        ProductSuccessCode code = ProductSuccessCode.GET_PACKAGES_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .result(packages)
+                .build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
 }
