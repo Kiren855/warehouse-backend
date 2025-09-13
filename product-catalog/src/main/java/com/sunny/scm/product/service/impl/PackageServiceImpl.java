@@ -14,6 +14,8 @@ import com.sunny.scm.product.repository.ProductRepository;
 import com.sunny.scm.product.service.PackageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +26,7 @@ public class PackageServiceImpl implements PackageService {
     private final ProductRepository productRepository;
     private final LoggingProducer loggingProducer;
     @Override
+    @CacheEvict(value = "product_details", key = "#productId")
     public void createPackage(Long productId, CreatePackageRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.PRODUCT_NOT_EXIST));
@@ -36,6 +39,7 @@ public class PackageServiceImpl implements PackageService {
     }
 
     @Override
+    @CacheEvict(value = "product_details", key = "#productId")
     public void updatePackage(Long productId, Long packageId, UpdatePackageRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.PRODUCT_NOT_EXIST));
@@ -78,6 +82,7 @@ public class PackageServiceImpl implements PackageService {
     }
 
     @Override
+    @CacheEvict(value = "product_details", key = "#productId")
     public void deletePackage(Long productId, Long packageId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.PRODUCT_NOT_EXIST));

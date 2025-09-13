@@ -1,10 +1,12 @@
 package com.sunny.scm.product.service.impl;
 
+import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.ProductErrorCode;
 import com.sunny.scm.product.dto.product.ProductDetailResponse;
 import com.sunny.scm.product.dto.product.CreateProductRequest;
+import com.sunny.scm.product.dto.product.ProductResponse;
 import com.sunny.scm.product.dto.product.UpdateProductRequest;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -60,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CachePut(value = "product_details", key = "#productId")
+    @CacheEvict(value = "product_details", key = "#productId")
     public void updateProduct(Long productId, UpdateProductRequest request) {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.PRODUCT_NOT_EXIST));
@@ -102,6 +105,27 @@ public class ProductServiceImpl implements ProductService {
 
         List<String> categoryNames = categoryService.getCategoryPath(product.getCategory().getId());
         return ProductDetailResponse.fromEntity(product, categoryNames);
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getProducts(int page, int size) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String companyId = jwt.getClaimAsString("company_id");
+
+        Page<ProductResponse> products = productRepository.findAllByCompanyId(
+                Long.valueOf(companyId),
+                org.springframework.data.domain.PageRequest.of(page, size)
+        ).map(product -> ProductResponse.builder()
+                .id(product.getId())
+                .productSku(product.getProductSku())
+                .productName(product.getProductName())
+                .categoryName(product.getCategory().getCategoryName())
+                .unit(product.getUnit())
+                .status(product.getStatus().name())
+                .build());
+
+        return PageResponse.from(products);
     }
 
 

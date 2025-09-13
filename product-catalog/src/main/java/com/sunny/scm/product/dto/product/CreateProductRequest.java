@@ -32,6 +32,7 @@ public class CreateProductRequest {
         return Product.builder()
                 .productName(request.getProductName())
                 .description(request.getDescription())
+                .unit(request.getUnit())
                 .status(ProductStatus.INACTIVE)
                 .build();
     }

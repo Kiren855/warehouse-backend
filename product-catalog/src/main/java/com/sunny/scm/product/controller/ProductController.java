@@ -20,9 +20,28 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     private final ProductService productService;
     private final PackageService packageService;
+
+    @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "VIEW_PRODUCT", "ALL_PERMISSIONS"})
+    @GetMapping()
+    public ResponseEntity<?> getProducts(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+
+        var products = productService.getProducts(page, size);
+
+        ProductSuccessCode code = ProductSuccessCode.GET_PRODUCTS_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .result(products)
+                .build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
     @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "CREATE_PRODUCT", "ALL_PERMISSIONS"})
     @PostMapping()
-    public ResponseEntity<ApiResponse<?>> createProduct(
+    public ResponseEntity<?> createProduct(
         @Valid @RequestBody CreateProductRequest request) {
         productService.createProduct(request);
         ProductSuccessCode code = ProductSuccessCode.CREATE_PRODUCT_SUCCESS;

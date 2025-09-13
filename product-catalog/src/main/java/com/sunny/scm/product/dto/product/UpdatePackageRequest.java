@@ -33,6 +33,5 @@ public class UpdatePackageRequest {
     String barcode;
 
     @JsonProperty("quantity_in_parent")
-
     Integer quantityInParent;
 }

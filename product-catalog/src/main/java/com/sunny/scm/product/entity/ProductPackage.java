@@ -3,10 +3,7 @@ package com.sunny.scm.product.entity;
 import com.sunny.scm.common.base.BaseEntity;
 import com.sunny.scm.product.constant.PackageType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
@@ -14,6 +11,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "product_packages")
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Getter
 @Setter
