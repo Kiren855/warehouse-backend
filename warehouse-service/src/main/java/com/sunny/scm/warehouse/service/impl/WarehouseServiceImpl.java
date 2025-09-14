@@ -1,7 +1,9 @@
 package com.sunny.scm.warehouse.service.impl;
 
+import com.sunny.scm.warehouse.constant.LogAction;
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
 import com.sunny.scm.warehouse.entity.Warehouse;
+import com.sunny.scm.warehouse.event.LoggingProducer;
 import com.sunny.scm.warehouse.repository.WarehouseRepository;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
+    private final LoggingProducer loggingProducer;
     @Override
     public void createWarehouse(CreateWarehouseRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        String companyId = (jwt.getClaimAsString("company_id");
+        String companyId = jwt.getClaimAsString("company_id");
 
         long count = warehouseRepository.countByCompanyId(Long.valueOf(companyId));
         long sequence = count + 1;
@@ -32,7 +35,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         newWarehouse.setWarehouseCode(warehouseCode);
 
         warehouseRepository.save(newWarehouse);
-        String action =
+        String action = LogAction.CREATE_WAREHOUSE.format(warehouseCode);
+        loggingProducer.sendMessage(action);
     }
 
     @Override
