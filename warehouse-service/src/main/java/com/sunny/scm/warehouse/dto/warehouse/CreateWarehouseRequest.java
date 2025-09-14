@@ -1,0 +1,28 @@
+package com.sunny.scm.warehouse.dto.warehouse;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+public class CreateWarehouseRequest {
+
+    @JsonProperty("warehouse_code")
+    @NotBlank(message = "warehouseCode is required")
+    @Size(max = 10, message = "warehouseCode must not exceed 10 characters")
+    String warehouseCode;
+
+    @NotBlank(message = "warehouseName is required")
+    @JsonProperty("warehouse_name")
+    String warehouseName;
+
+    @NotBlank(message = "location is required")
+    String location;
+}
