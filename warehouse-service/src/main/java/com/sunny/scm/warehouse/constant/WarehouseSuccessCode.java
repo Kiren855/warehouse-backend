@@ -6,8 +6,9 @@ import org.springframework.http.HttpStatus;
 public enum WarehouseSuccessCode implements BaseCodeError {
     CREATE_WAREHOUSE_SUCCESS("S30001", "Create warehouse success", HttpStatus.OK),
     UPDATE_WAREHOUSE_SUCCESS("S30002", "Update warehouse success", HttpStatus.OK),
-    DELETE_WAREHOUSE_SUCCESS("S30003", "Delete warehouse success", HttpStatus.OK)
-    ;
+    DELETE_WAREHOUSE_SUCCESS("S30003", "Delete warehouse success", HttpStatus.OK),
+    GET_WAREHOUSES_SUCCESS("S30004", "Get warehouses success", HttpStatus.OK),
+    SEARCH_WAREHOUSES_SUCCESS("S30005", "Search warehouses success", HttpStatus.OK);
     String code;
     String message;
     HttpStatus httpStatus;

@@ -3,10 +3,7 @@ package com.sunny.scm.product.controller;
 import com.sunny.scm.grpc_common.aop.CheckPermission;
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.product.constant.ProductSuccessCode;
-import com.sunny.scm.product.dto.product.CreatePackageRequest;
-import com.sunny.scm.product.dto.product.CreateProductRequest;
-import com.sunny.scm.product.dto.product.UpdatePackageRequest;
-import com.sunny.scm.product.dto.product.UpdateProductRequest;
+import com.sunny.scm.product.dto.product.*;
 import com.sunny.scm.product.service.PackageService;
 import com.sunny.scm.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -124,11 +121,12 @@ public class ProductController {
     }
 
     @CheckPermission(permission = {"PRODUCT_CATALOG_MANAGER", "DELETE_PACKAGE", "ALL_PERMISSIONS"})
-    @DeleteMapping("/{productId}/packages/{packageId}")
+    @DeleteMapping("/{productId}/packages")
     public ResponseEntity<?> deletePackage(
-    @PathVariable Long productId,
-    @PathVariable Long packageId) {
-        packageService.deletePackage(productId, packageId);
+            @PathVariable Long productId,
+            @RequestBody DeletePackageRequest request)
+    {
+        packageService.deletePackages(productId, request);
         ProductSuccessCode code = ProductSuccessCode.DELETE_PACKAGE_SUCCESS;
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(code.getCode())

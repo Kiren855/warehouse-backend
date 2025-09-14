@@ -8,14 +8,55 @@ import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/warehouse/api/v1/warehouses")
 @RequiredArgsConstructor
 public class WarehouseController {
     private final WarehouseService warehouseService;
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "SEARCH_WAREHOUSE", "ALL_PERMISSIONS"})
+    @GetMapping("/search")
+    public ResponseEntity<?> searchWarehouses(
+            @RequestParam(name = "query") String query,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size)
+    {
+        var response = warehouseService.searchWarehouses(query, page, size);
+        WarehouseSuccessCode code = WarehouseSuccessCode.SEARCH_WAREHOUSES_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
+    @GetMapping()
+    public ResponseEntity<?> getWarehouses(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdTo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "creationTimestamp,desc") String sort)
+    {
+        var response = warehouseService.getWarehouses(keyword, createdFrom, createdTo, page, size, sort);
+
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_WAREHOUSES_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
+                    .build());
+    }
 
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CREATE_WAREHOUSE", "ALL_PERMISSIONS"})
     @PostMapping()
