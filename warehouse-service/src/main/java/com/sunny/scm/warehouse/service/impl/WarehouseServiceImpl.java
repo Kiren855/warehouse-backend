@@ -1,6 +1,7 @@
 package com.sunny.scm.warehouse.service.impl;
 
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
+import com.sunny.scm.warehouse.entity.Warehouse;
 import com.sunny.scm.warehouse.repository.WarehouseRepository;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +20,19 @@ public class WarehouseServiceImpl implements WarehouseService {
     public void createWarehouse(CreateWarehouseRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        String username = jwt.getClaimAsString("preferred_username");
-        String companyId = jwt.getClaimAsString("company_id");
+        String companyId = (jwt.getClaimAsString("company_id");
 
+        long count = warehouseRepository.countByCompanyId(Long.valueOf(companyId));
+        long sequence = count + 1;
 
+        String warehouseCode = String.format("WH-%s-%03d", companyId, sequence);
+
+        Warehouse newWarehouse = CreateWarehouseRequest.toEntity(request);
+        newWarehouse.setCompanyId(Long.valueOf(companyId));
+        newWarehouse.setWarehouseCode(warehouseCode);
+
+        warehouseRepository.save(newWarehouse);
+        String action =
     }
 
     @Override

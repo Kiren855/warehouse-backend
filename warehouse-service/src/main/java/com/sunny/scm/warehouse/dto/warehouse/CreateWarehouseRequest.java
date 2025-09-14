@@ -1,6 +1,7 @@
 package com.sunny.scm.warehouse.dto.warehouse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sunny.scm.warehouse.entity.Warehouse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,4 +26,11 @@ public class CreateWarehouseRequest {
 
     @NotBlank(message = "location is required")
     String location;
+
+    public static Warehouse toEntity(CreateWarehouseRequest request) {
+        return Warehouse.builder()
+                .warehouseName(request.getWarehouseName())
+                .location(request.getLocation())
+                .build();
+    }
 }
