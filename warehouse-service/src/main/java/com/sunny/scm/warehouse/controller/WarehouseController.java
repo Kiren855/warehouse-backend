@@ -46,6 +46,16 @@ public class WarehouseController {
                     .build());
     }
 
-
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "DELETE_WAREHOUSE", "ALL_PERMISSIONS"})
+    @DeleteMapping("/{warehouseId}")
+    public ResponseEntity<?> deleteWarehouse(@PathVariable Long warehouseId) {
+        warehouseService.deleteWarehouse(warehouseId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.DELETE_WAREHOUSE_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .build());
+    }
 
 }

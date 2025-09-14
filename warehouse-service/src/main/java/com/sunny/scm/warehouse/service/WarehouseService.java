@@ -6,5 +6,5 @@ import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 public interface WarehouseService {
     void createWarehouse(CreateWarehouseRequest request);
     void updateWarehouse(Long warehouseId, UpdateWarehouseRequest request);
-    void deleteWarehouse();
+    void deleteWarehouse(Long warehouseId);
 }

@@ -61,7 +61,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void deleteWarehouse() {
+    public void deleteWarehouse(Long warehouseId) {
+        Warehouse warehouse = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
 
+        warehouseRepository.delete(warehouse);
+        String action = LogAction.DELETE_WAREHOUSE.format(warehouse.getWarehouseCode());
+        loggingProducer.sendMessage(action);
     }
 }
