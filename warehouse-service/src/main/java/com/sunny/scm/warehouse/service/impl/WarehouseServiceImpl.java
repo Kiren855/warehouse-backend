@@ -9,9 +9,8 @@ import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.WarehouseResponse;
 import com.sunny.scm.warehouse.entity.Warehouse;
 import com.sunny.scm.warehouse.event.LoggingProducer;
+import com.sunny.scm.warehouse.helper.WarehouseSpecifications;
 import com.sunny.scm.warehouse.repository.WarehouseRepository;
-import com.sunny.scm.warehouse.repository.spec.WarehouseSpecification;
-import com.sunny.scm.warehouse.service.SequenceService;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +18,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -32,19 +33,17 @@ import java.time.LocalDate;
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final LoggingProducer loggingProducer;
-    private final SequenceService sequenceService;
     @Override
     public void createWarehouse(CreateWarehouseRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String companyId = jwt.getClaimAsString("company_id");
 
-        long count = sequenceService.nextSequenceForCompany(Long.valueOf(companyId));
-
-        String warehouseCode = String.format("WH-%s-%03d", companyId, count);
-
         Warehouse newWarehouse = CreateWarehouseRequest.toEntity(request);
         newWarehouse.setCompanyId(Long.valueOf(companyId));
+        Long number = newWarehouse.getId();
+        String warehouseCode = String.format("WH-%s-%06d", companyId, number);
+
         newWarehouse.setWarehouseCode(warehouseCode);
 
         warehouseRepository.save(newWarehouse);
@@ -99,21 +98,22 @@ public class WarehouseServiceImpl implements WarehouseService {
                 : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortParams[0]));
 
-        Page<WarehouseResponse> warehouses = warehouseRepository.findAll(
-                WarehouseSpecification.filter(companyId, keyword, createdFrom, createdTo),
-                pageable
-        ).map(warehouse -> WarehouseResponse.builder()
-                .id(warehouse.getId())
-                .warehouseName(warehouse.getWarehouseName())
-                .warehouseCode(warehouse.getWarehouseCode())
-                .location(warehouse.getLocation())
-                .createdAt(warehouse.getCreationTimestamp())
-                .updatedAt(warehouse.getUpdateTimestamp())
-                .build());
+        Specification<Warehouse> spec = WarehouseSpecifications.belongsToCompany(companyId)
+                .and(WarehouseSpecifications.likeCodeOrName(keyword))
+                .and(WarehouseSpecifications.createdBetween(createdFrom, createdTo));
+
+        Page<WarehouseResponse> warehouses = warehouseRepository.findAll(spec, pageable)
+                .map(warehouse -> WarehouseResponse.builder()
+                        .id(warehouse.getId())
+                        .warehouseName(warehouse.getWarehouseName())
+                        .warehouseCode(warehouse.getWarehouseCode())
+                        .location(warehouse.getLocation())
+                        .createdAt(warehouse.getCreationTimestamp())
+                        .updatedAt(warehouse.getUpdateTimestamp())
+                        .build());
 
         return PageResponse.from(warehouses);
     }
-
 
     @Override
     public PageResponse<WarehouseResponse> searchWarehouses(String query, int page, int size) {
