@@ -11,9 +11,11 @@ import com.sunny.scm.warehouse.dto.zone.ZoneResponse;
 import com.sunny.scm.warehouse.entity.Warehouse;
 import com.sunny.scm.warehouse.entity.Zone;
 import com.sunny.scm.warehouse.event.LoggingProducer;
+import com.sunny.scm.warehouse.helper.EntityCodeGenerator;
 import com.sunny.scm.warehouse.helper.ZoneSpecifications;
 import com.sunny.scm.warehouse.repository.WarehouseRepository;
 import com.sunny.scm.warehouse.repository.ZoneRepository;
+import com.sunny.scm.warehouse.service.SequenceService;
 import com.sunny.scm.warehouse.service.ZoneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -33,18 +37,20 @@ public class ZoneServiceImpl implements ZoneService {
     private final ZoneRepository zoneRepository;
     private final WarehouseRepository warehouseRepository;
     private final LoggingProducer loggingProducer;
+    private final SequenceService sequenceService;
     @Override
+    @Transactional
     public void createZone(Long warehouseId, CreateZoneRequest request) {
         Warehouse warehouse = warehouseRepository.findById(warehouseId)
         .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
 
         Zone newZone = CreateZoneRequest.toEntity(request);
         newZone.setWarehouse(warehouse);
-        var exitszone = zoneRepository.save(newZone);
-        Long zoneId = exitszone.getId();
-        String zoneCode = String.format("ZC-%s-%05d", warehouse.getWarehouseCode(), zoneId);
-        exitszone.setZoneCode(zoneCode);
-        zoneRepository.save(exitszone);
+
+        Long sequence = sequenceService.getNextSequence("ZONE", warehouse.getId());
+        String zoneCode = EntityCodeGenerator.generateZoneCode(warehouse.getWarehouseCode(), sequence);
+        newZone.setZoneCode(zoneCode);
+        zoneRepository.save(newZone);
 
         String action = LogAction.CREATE_ZONE.format(zoneCode);
         loggingProducer.sendMessage(action);

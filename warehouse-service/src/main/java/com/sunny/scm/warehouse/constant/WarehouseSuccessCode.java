@@ -8,7 +8,10 @@ public enum WarehouseSuccessCode implements BaseCodeError {
     UPDATE_WAREHOUSE_SUCCESS("S30002", "Update warehouse success", HttpStatus.OK),
     DELETE_WAREHOUSE_SUCCESS("S30003", "Delete warehouse success", HttpStatus.OK),
     GET_WAREHOUSES_SUCCESS("S30004", "Get warehouses success", HttpStatus.OK),
-    SEARCH_WAREHOUSES_SUCCESS("S30005", "Search warehouses success", HttpStatus.OK);
+    GET_ZONES_SUCCESS("S30006", "Get zones success", HttpStatus.OK),
+    CREATE_ZONE_SUCCESS("S30007", "Create zone success", HttpStatus.OK),
+    UPDATE_ZONE_SUCCESS("S30008", "Update zone success", HttpStatus.OK),
+    DELETE_ZONE_SUCCESS("S30009", "Delete zone success", HttpStatus.OK),;
     String code;
     String message;
     HttpStatus httpStatus;

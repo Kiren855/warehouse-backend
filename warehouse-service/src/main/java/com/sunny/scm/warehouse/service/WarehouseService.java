@@ -17,5 +17,4 @@ public interface WarehouseService {
                                                    int page,
                                                    int size,
                                                    String sort);
-    PageResponse<WarehouseResponse> searchWarehouses(String query, int page, int size);
 }

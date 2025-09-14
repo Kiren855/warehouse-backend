@@ -35,8 +35,4 @@ public class Warehouse extends BaseEntity {
     @Column(name = "location")
     String location;
 
-    @PostPersist
-    public void generateCode() {
-        this.warehouseCode = String.format("WH-%s-%06d", this.companyId, super.getId());
-    }
 }
