@@ -1,8 +1,6 @@
 package com.sunny.scm.identity.service.impl;
 
-import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.PageResponse;
-import com.sunny.scm.common.dto.RoleResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
 import com.sunny.scm.identity.constant.LogAction;
@@ -18,18 +16,15 @@ import com.sunny.scm.identity.repository.UserRepository;
 import com.sunny.scm.identity.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,9 +74,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public PageResponse<UsersResponse> getUsersInGroup(Long groupId, int page, int size) {
-        Group group = groupRepository.findById(groupId)
-            .orElseThrow(() -> new AppException(IdentityErrorCode.GROUP_NOT_EXISTS));
-
         Page<User> users = groupRepository.findUsersByGroupId(
                 groupId,
                 PageRequest.of(page, size)

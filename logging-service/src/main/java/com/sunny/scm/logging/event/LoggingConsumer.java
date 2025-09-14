@@ -1,4 +1,4 @@
-package com.sunny.scm.logging.kafka;
+package com.sunny.scm.logging.event;
 
 import com.sunny.scm.common.event.LoggingEvent;
 import com.sunny.scm.logging.repository.LogRepository;

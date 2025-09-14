@@ -30,7 +30,6 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
         if (Objects.nonNull(accessor) && StompCommand.CONNECT.equals(accessor.getCommand())) {
             String authHeader = accessor.getFirstNativeHeader("Authorization");
-            log.info("Authorization header: {}", authHeader);
 
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
@@ -41,10 +40,9 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
                     if (authentication != null) {
                         accessor.setUser(authentication);
-                        log.info("User {} authenticated for WebSocket session.", authentication.getName());
                     }
                 } catch (Exception e) {
-                    log.error("WebSocket authentication error: {}", e.getMessage(), e); // Thêm 'e' để in stack trace
+
                 }
             }
         }

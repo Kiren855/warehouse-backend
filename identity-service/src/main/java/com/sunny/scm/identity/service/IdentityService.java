@@ -3,6 +3,8 @@ package com.sunny.scm.identity.service;
 
 import com.sunny.scm.identity.dto.auth.*;
 
+import java.util.List;
+
 
 public interface IdentityService {
     String register(RegisterRootRequest request);
@@ -13,4 +15,5 @@ public interface IdentityService {
     void changeSubPassword(String userId, ChangePasswordRequest request);
     void changeRootPassword(ChangePasswordRequest request);
     void logout(String token);
+    boolean checkPermission(String userId, List<String> roleNames);
 }
