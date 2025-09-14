@@ -41,12 +41,10 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         Warehouse newWarehouse = CreateWarehouseRequest.toEntity(request);
         newWarehouse.setCompanyId(Long.valueOf(companyId));
-        Long number = newWarehouse.getId();
-        String warehouseCode = String.format("WH-%s-%06d", companyId, number);
 
-        newWarehouse.setWarehouseCode(warehouseCode);
+        var existingWarehouses = warehouseRepository.save(newWarehouse);
+        String warehouseCode = existingWarehouses.getWarehouseCode();
 
-        warehouseRepository.save(newWarehouse);
         String action = LogAction.CREATE_WAREHOUSE.format(warehouseCode);
         loggingProducer.sendMessage(action);
     }

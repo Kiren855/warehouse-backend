@@ -11,7 +11,6 @@ public class WarehouseSpecifications {
         return SpecificationUtils.equal("companyId", companyId);
     }
 
-    // Filter theo keyword trên warehouseCode hoặc warehouseName
     public static Specification<Warehouse> likeCodeOrName(String keyword) {
         return SpecificationUtils.orLikeIgnoreCase(List.of("warehouseCode", "warehouseName"), keyword);
     }

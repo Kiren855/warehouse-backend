@@ -4,6 +4,7 @@ import com.sunny.scm.common.base.BaseEntity;
 import com.sunny.scm.warehouse.constant.ZoneType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Setter
 @Getter
+@Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class Zone extends BaseEntity {
 
@@ -26,4 +28,5 @@ public class Zone extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouse_id", nullable = false)
     Warehouse warehouse;
+
 }
