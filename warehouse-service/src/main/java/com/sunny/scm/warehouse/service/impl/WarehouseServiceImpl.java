@@ -1,7 +1,10 @@
 package com.sunny.scm.warehouse.service.impl;
 
+import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.warehouse.constant.LogAction;
+import com.sunny.scm.warehouse.constant.WarehouseErrorCode;
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
+import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.entity.Warehouse;
 import com.sunny.scm.warehouse.event.LoggingProducer;
 import com.sunny.scm.warehouse.repository.WarehouseRepository;
@@ -40,8 +43,21 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void updateWarehouse() {
+    public void updateWarehouse(Long warehouseId, UpdateWarehouseRequest request) {
+        Warehouse warehouse = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
 
+        if(request.getWarehouseName() != null) {
+            warehouse.setWarehouseName(request.getWarehouseName());
+        }
+
+        if (request.getLocation() != null) {
+            warehouse.setLocation(request.getLocation());
+        }
+
+        warehouseRepository.save(warehouse);
+        String action = LogAction.UPDATE_WAREHOUSE.format(warehouse.getWarehouseCode());
+        loggingProducer.sendMessage(action);
     }
 
     @Override
