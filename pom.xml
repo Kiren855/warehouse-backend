@@ -19,6 +19,7 @@
         <module>discoveryserver</module>
         <module>logging-service</module>
         <module>product-catalog</module>
+        <module>warehouse-service</module>
         <module>common</module>
         <module>grpc-common</module>
     </modules>

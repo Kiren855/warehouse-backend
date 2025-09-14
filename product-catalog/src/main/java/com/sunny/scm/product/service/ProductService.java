@@ -14,4 +14,6 @@ public interface ProductService {
     ProductDetailResponse getProductDetail(Long productId);
 
     PageResponse<ProductResponse> getProducts(int page, int size);
+
+    void changeStatus(Long productId, Boolean active);
 }

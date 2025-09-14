@@ -15,6 +15,15 @@
         <module name="logging-service" />
         <module name="grpc-common" />
       </profile>
+      <profile name="Annotation profile for supply-chain-management" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="warehouse-service" />
+      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
@@ -26,6 +35,7 @@
       <module name="identity-service" options="-parameters" />
       <module name="logging-service" options="-parameters" />
       <module name="product-catalog" options="-parameters" />
+      <module name="warehouse-service" options="-parameters" />
     </option>
   </component>
 </project>
