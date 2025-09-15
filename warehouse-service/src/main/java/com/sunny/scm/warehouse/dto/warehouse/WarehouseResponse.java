@@ -27,4 +27,6 @@ public class WarehouseResponse {
     LocalDateTime createdAt;
     @JsonProperty("update_at")
     LocalDateTime updatedAt;
+
+    String status;
 }

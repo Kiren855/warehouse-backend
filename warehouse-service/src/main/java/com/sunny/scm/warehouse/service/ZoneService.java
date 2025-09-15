@@ -10,6 +10,7 @@ import com.sunny.scm.warehouse.dto.zone.ZoneResponse;
 import java.time.LocalDate;
 
 public interface ZoneService {
+    ZoneResponse getZone(Long warehouseId, Long zoneId);
     void createZone(Long warehouseId, CreateZoneRequest request);
     void updateZone(Long warehouseId, Long zoneId, UpdateZoneRequest request);
 

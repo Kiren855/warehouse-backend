@@ -1,5 +1,6 @@
 package com.sunny.scm.warehouse.helper;
 
+import com.sunny.scm.warehouse.constant.WarehouseStatus;
 import com.sunny.scm.warehouse.entity.Warehouse;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -18,5 +19,10 @@ public class WarehouseSpecifications {
     // Filter theo creation date
     public static Specification<Warehouse> createdBetween(LocalDate from, LocalDate to) {
         return SpecificationUtils.betweenDate("creationTimestamp", from, to);
+    }
+
+    public static Specification<Warehouse> hasStatus(WarehouseStatus status) {
+        if (status == null) return null;
+        return SpecificationUtils.equal("status", status);
     }
 }

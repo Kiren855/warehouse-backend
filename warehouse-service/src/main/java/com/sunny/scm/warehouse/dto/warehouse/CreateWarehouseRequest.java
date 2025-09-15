@@ -1,6 +1,7 @@
 package com.sunny.scm.warehouse.dto.warehouse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sunny.scm.warehouse.constant.WarehouseStatus;
 import com.sunny.scm.warehouse.entity.Warehouse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,6 +37,7 @@ public class CreateWarehouseRequest {
                 .location(request.getLocation())
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
+                .status(WarehouseStatus.ACTIVE)
                 .build();
     }
 }

@@ -19,6 +19,8 @@ import com.sunny.scm.warehouse.service.SequenceService;
 import com.sunny.scm.warehouse.service.ZoneService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,26 @@ public class ZoneServiceImpl implements ZoneService {
     private final WarehouseRepository warehouseRepository;
     private final LoggingProducer loggingProducer;
     private final SequenceService sequenceService;
+
+    @Override
+    @Cacheable(value = "zone_detail", key = "#zoneId")
+    public ZoneResponse getZone(Long warehouseId, Long zoneId) {
+        warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
+
+        Zone zone = zoneRepository.findById(zoneId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.ZONE_NOT_FOUND));
+
+        return ZoneResponse.builder()
+                .id(zone.getId())
+                .zoneCode(zone.getZoneCode())
+                .zoneName(zone.getZoneName())
+                .zoneType(zone.getZoneType().toString())
+                .createdAt(zone.getCreationTimestamp())
+                .updatedAt(zone.getUpdateTimestamp())
+                .build();
+    }
+
     @Override
     @Transactional
     public void createZone(Long warehouseId, CreateZoneRequest request) {
@@ -57,6 +79,7 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
+    @CacheEvict(value = "zone_detail", key = "#zoneId")
     public void updateZone(Long warehouseId, Long zoneId, UpdateZoneRequest request) {
         warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
@@ -78,6 +101,7 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
+    @CacheEvict(value = "zone_detail", key = "#zoneId")
     public void deleteZone(Long warehouseId, Long zoneId) {
         warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));

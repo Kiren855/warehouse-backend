@@ -4,6 +4,7 @@ import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.warehouse.constant.LogAction;
 import com.sunny.scm.warehouse.constant.WarehouseErrorCode;
+import com.sunny.scm.warehouse.constant.WarehouseStatus;
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.WarehouseResponse;
@@ -52,6 +53,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .location(warehouse.getLocation())
                 .longitude(warehouse.getLongitude())
                 .latitude(warehouse.getLatitude())
+                .status(warehouse.getStatus().name())
                 .createdAt(warehouse.getCreationTimestamp())
                 .updatedAt(warehouse.getUpdateTimestamp()).build();
     }
@@ -117,6 +119,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public PageResponse<WarehouseResponse> getWarehouses(
             String keyword,
+            WarehouseStatus status,
             LocalDate createdFrom,
             LocalDate createdTo,
             int page,
@@ -135,7 +138,8 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         Specification<Warehouse> spec = WarehouseSpecifications.belongsToCompany(companyId)
                 .and(WarehouseSpecifications.likeCodeOrName(keyword))
-                .and(WarehouseSpecifications.createdBetween(createdFrom, createdTo));
+                .and(WarehouseSpecifications.createdBetween(createdFrom, createdTo))
+                .and(WarehouseSpecifications.hasStatus(status));;
 
         Page<WarehouseResponse> warehouses = warehouseRepository.findAll(spec, pageable)
                 .map(warehouse -> WarehouseResponse.builder()
@@ -145,6 +149,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                         .location(warehouse.getLocation())
                         .latitude(warehouse.getLatitude())
                         .longitude(warehouse.getLongitude())
+                        .status(warehouse.getStatus().name())
                         .createdAt(warehouse.getCreationTimestamp())
                         .updatedAt(warehouse.getUpdateTimestamp())
                         .build());

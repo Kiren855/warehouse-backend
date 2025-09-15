@@ -2,7 +2,9 @@ package com.sunny.scm.warehouse.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.grpc_common.aop.CheckPermission;
+import com.sunny.scm.warehouse.constant.WarehouseStatus;
 import com.sunny.scm.warehouse.constant.WarehouseSuccessCode;
+import com.sunny.scm.warehouse.constant.ZoneType;
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.service.WarehouseService;
@@ -36,13 +38,19 @@ public class WarehouseController {
     @GetMapping()
     public ResponseEntity<?> getWarehouses(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "creationTimestamp,desc") String sort)
     {
-        var response = warehouseService.getWarehouses(keyword, createdFrom, createdTo, page, size, sort);
+        WarehouseStatus warehouseStatus = null;
+        if (status != null && !status.isBlank()) {
+            warehouseStatus = WarehouseStatus.valueOf(status.toUpperCase());
+        }
+
+        var response = warehouseService.getWarehouses(keyword, warehouseStatus, createdFrom, createdTo, page, size, sort);
 
         WarehouseSuccessCode code = WarehouseSuccessCode.GET_WAREHOUSES_SUCCESS;
         return ResponseEntity.status(code.getHttpStatus())

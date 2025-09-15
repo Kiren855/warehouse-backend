@@ -51,6 +51,22 @@ public class ZoneController {
                     .build());
     }
 
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_ZONE", "ALL_PERMISSIONS"})
+    @GetMapping("/{warehouseId}/zones/{zoneId}")
+    public ResponseEntity<?> getZone(
+            @PathVariable Long warehouseId,
+            @PathVariable Long zoneId)
+    {
+        var response = zoneService.getZone(warehouseId, zoneId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_ZONE_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
+                    .build());
+    }
+
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CREATE_ZONE", "ALL_PERMISSIONS"})
     @PostMapping("/{warehouseId}/zones")
     public ResponseEntity<?> createZone(

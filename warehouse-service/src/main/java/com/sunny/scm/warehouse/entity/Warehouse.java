@@ -1,6 +1,7 @@
 package com.sunny.scm.warehouse.entity;
 
 import com.sunny.scm.common.base.BaseEntity;
+import com.sunny.scm.warehouse.constant.WarehouseStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -38,4 +39,7 @@ public class Warehouse extends BaseEntity {
     Double latitude;
     Double longitude;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    WarehouseStatus status;
 }
