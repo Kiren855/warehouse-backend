@@ -37,4 +37,5 @@ public class Warehouse extends BaseEntity {
 
     Double latitude;
     Double longitude;
+
 }

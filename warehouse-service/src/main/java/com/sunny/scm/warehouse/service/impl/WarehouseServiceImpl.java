@@ -50,6 +50,8 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .warehouseName(warehouse.getWarehouseName())
                 .warehouseCode(warehouse.getWarehouseCode())
                 .location(warehouse.getLocation())
+                .longitude(warehouse.getLongitude())
+                .latitude(warehouse.getLatitude())
                 .createdAt(warehouse.getCreationTimestamp())
                 .updatedAt(warehouse.getUpdateTimestamp()).build();
     }
@@ -86,6 +88,14 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         if (request.getLocation() != null) {
             warehouse.setLocation(request.getLocation());
+        }
+
+        if(request.getLatitude() != null) {
+            warehouse.setLatitude(request.getLatitude());
+        }
+
+        if (request.getLongitude() != null) {
+            warehouse.setLongitude(request.getLongitude());
         }
 
         warehouseRepository.save(warehouse);
@@ -133,6 +143,8 @@ public class WarehouseServiceImpl implements WarehouseService {
                         .warehouseName(warehouse.getWarehouseName())
                         .warehouseCode(warehouse.getWarehouseCode())
                         .location(warehouse.getLocation())
+                        .latitude(warehouse.getLatitude())
+                        .longitude(warehouse.getLongitude())
                         .createdAt(warehouse.getCreationTimestamp())
                         .updatedAt(warehouse.getUpdateTimestamp())
                         .build());

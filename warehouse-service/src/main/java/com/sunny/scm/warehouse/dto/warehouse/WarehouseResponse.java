@@ -20,6 +20,9 @@ public class WarehouseResponse {
     String warehouseName;
     String location;
 
+    Double latitude;
+    Double longitude;
+
     @JsonProperty("create_at")
     LocalDateTime createdAt;
     @JsonProperty("update_at")

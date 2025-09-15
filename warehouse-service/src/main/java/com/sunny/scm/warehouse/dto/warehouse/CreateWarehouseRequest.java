@@ -27,10 +27,15 @@ public class CreateWarehouseRequest {
     @NotBlank(message = "location is required")
     String location;
 
+    Double latitude;
+    Double longitude;
+
     public static Warehouse toEntity(CreateWarehouseRequest request) {
         return Warehouse.builder()
                 .warehouseName(request.getWarehouseName())
                 .location(request.getLocation())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .build();
     }
 }
