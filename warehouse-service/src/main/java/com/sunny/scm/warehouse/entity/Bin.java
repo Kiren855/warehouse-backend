@@ -22,35 +22,35 @@ import java.util.Set;
 public class Bin extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "zone_id", nullable = false)
-    private Zone zone;
+    Zone zone;
 
     @Column(name = "code", length = 20, nullable = false)
-    private String code;
+    String binCode;
 
     @Column(name = "name", length = 100, nullable = false)
-    private String name;
+    String binName;
 
     @Column(name = "length", precision = 10, scale = 2, nullable = false)
-    private BigDecimal length;
+    BigDecimal length;
 
     @Column(name = "width", precision = 10, scale = 2, nullable = false)
-    private BigDecimal width;
+    BigDecimal width;
 
     @Column(name = "height", precision = 10, scale = 2, nullable = false)
-    private BigDecimal height;
+    BigDecimal height;
 
     @Column(name = "max_weight", precision = 10, scale = 2, nullable = false)
-    private BigDecimal maxWeight;
+    BigDecimal maxWeight;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "bin_type", nullable = false)
     BinType binType;
 
     @Column(name = "current_volume_used", precision = 14, scale = 4, nullable = false)
-    private BigDecimal currentVolumeUsed = BigDecimal.ZERO;
+    BigDecimal currentVolumeUsed = BigDecimal.ZERO;
 
     @Column(name = "current_weight_used", precision = 10, scale = 2, nullable = false)
-    private BigDecimal currentWeightUsed = BigDecimal.ZERO;
+    BigDecimal currentWeightUsed = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

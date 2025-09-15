@@ -32,7 +32,7 @@ public class CreateBinRequest {
 
     public static Bin toEntity(CreateBinRequest request) {
         return Bin.builder()
-                .name(request.getBinName())
+                .binName(request.getBinName())
                 .length(request.getLength())
                 .width(request.getWidth())
                 .height(request.getHeight())

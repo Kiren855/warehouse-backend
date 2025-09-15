@@ -6,7 +6,10 @@ public enum LogAction {
     DELETE_WAREHOUSE("Delete warehouse with code %s"),
     CREATE_ZONE("Create zone with code %s"),
     UPDATE_ZONE("Update zone with code %s"),
-    DELETE_ZONE("Delete zone with code %s")
+    DELETE_ZONE("Delete zone with code %s"),
+    CREATE_BIN("Create bin with code %s"),
+    UPDATE_BIN("Update bin with code %s"),
+    DELETE_BIN("Delete bin with code %s")
     ;
     String value;
     LogAction(String value) {

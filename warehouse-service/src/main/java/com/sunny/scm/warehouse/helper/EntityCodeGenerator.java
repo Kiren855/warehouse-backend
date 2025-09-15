@@ -10,6 +10,6 @@ public class EntityCodeGenerator {
     }
 
     public static String generateBinCode(String zoneCode, Long sequence) {
-        return String.format("%s-BC- %03d", zoneCode, sequence);
+        return String.format("%s-BC-%03d", zoneCode, sequence);
     }
 }
