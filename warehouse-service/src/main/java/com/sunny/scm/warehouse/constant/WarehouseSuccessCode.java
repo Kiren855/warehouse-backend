@@ -17,7 +17,8 @@ public enum WarehouseSuccessCode implements BaseCodeError {
     CREATE_BIN_SUCCESS("S30012", "Create bin success", HttpStatus.OK),
     UPDATE_BIN_SUCCESS("S30013", "Update bin success", HttpStatus.OK),
     DELETE_BIN_SUCCESS("S30014", "Delete bin success", HttpStatus.OK),
-    GET_BINS_SUCCESS("S30015", "Get bins success", HttpStatus.OK),;
+    GET_BINS_SUCCESS("S30015", "Get bins success", HttpStatus.OK),
+    GET_BIN_SUCCESS("S30016", "Get bin success", HttpStatus.OK);
     String code;
     String message;
     HttpStatus httpStatus;

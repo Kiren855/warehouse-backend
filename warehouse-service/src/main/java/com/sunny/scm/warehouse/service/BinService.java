@@ -7,6 +7,8 @@ import com.sunny.scm.warehouse.dto.bin.BinResponse;
 import com.sunny.scm.warehouse.dto.bin.CreateBinRequest;
 import com.sunny.scm.warehouse.dto.bin.UpdateBinRequest;
 
+import java.time.LocalDate;
+
 public interface BinService {
     void createBin(Long zoneId, CreateBinRequest request);
     void updateBin(Long zoneId, Long BinId, UpdateBinRequest request);
@@ -17,6 +19,8 @@ public interface BinService {
             String keyword,
             BinType binType,
             BinStatus binStatus,
+            LocalDate createdFrom,
+            LocalDate createdTo,
             int page,
             int size,
             String sort);

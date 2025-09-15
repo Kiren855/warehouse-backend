@@ -2,6 +2,7 @@ package com.sunny.scm.warehouse.dto.bin;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sunny.scm.warehouse.entity.Bin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,4 +44,27 @@ public class BinResponse {
     LocalDateTime createdAt;
     @JsonProperty("update_at")
     LocalDateTime updatedAt;
+
+    public static BinResponse toResponse(Bin bin) {
+        BigDecimal maxVolume = bin.getLength()
+                .multiply(bin.getWidth())
+                .multiply(bin.getHeight());
+
+        return BinResponse.builder()
+                .id(bin.getId())
+                .binCode(bin.getBinCode())
+                .binName(bin.getBinName())
+                .binType(bin.getBinType().toString())
+                .status(bin.getBinStatus().toString())
+                .length(bin.getLength())
+                .width(bin.getWidth())
+                .height(bin.getHeight())
+                .maxWeight(bin.getMaxWeight())
+                .maxVolume(maxVolume)
+                .currentWeight(bin.getCurrentWeightUsed())
+                .currentVolume(bin.getCurrentVolumeUsed())
+                .createdAt(bin.getCreationTimestamp())
+                .updatedAt(bin.getUpdateTimestamp())
+                .build();
+    }
 }

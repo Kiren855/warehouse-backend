@@ -1,5 +1,6 @@
 package com.sunny.scm.warehouse.helper;
 
+import com.sunny.scm.warehouse.constant.BinStatus;
 import com.sunny.scm.warehouse.constant.BinType;
 import com.sunny.scm.warehouse.constant.ZoneType;
 import com.sunny.scm.warehouse.entity.Bin;
@@ -28,7 +29,7 @@ public class BinSpecifications {
                 binType == null ? cb.conjunction() : cb.equal(root.get("binType"), binType);
     }
 
-    public static Specification<Bin> hasStatus(String status) {
+    public static Specification<Bin> hasStatus(BinStatus status) {
         return (root, query, cb) ->
                 status == null ? cb.conjunction() : cb.equal(root.get("binStatus"), status);
     }
