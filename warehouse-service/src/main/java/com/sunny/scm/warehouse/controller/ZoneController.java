@@ -35,7 +35,12 @@ public class ZoneController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "creationTimestamp,desc") String sort)
     {
-        var response = zoneService.getZones(warehouseId, keyword, ZoneType.valueOf(zoneType), createdFrom, createdTo, page, size, sort);
+        ZoneType type = null;
+        if (zoneType != null && !zoneType.isBlank()) {
+            type = ZoneType.valueOf(zoneType.toUpperCase());
+        }
+
+        var response = zoneService.getZones(warehouseId, keyword, type, createdFrom, createdTo, page, size, sort);
         WarehouseSuccessCode code = WarehouseSuccessCode.GET_ZONES_SUCCESS;
 
         return ResponseEntity.status(code.getHttpStatus())

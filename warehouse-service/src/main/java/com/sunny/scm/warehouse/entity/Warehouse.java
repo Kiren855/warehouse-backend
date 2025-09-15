@@ -35,4 +35,6 @@ public class Warehouse extends BaseEntity {
     @Column(name = "location")
     String location;
 
+    Double latitude;
+    Double longitude;
 }

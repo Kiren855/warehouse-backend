@@ -3,15 +3,13 @@ package com.sunny.scm.warehouse.entity;
 import com.sunny.scm.common.base.BaseEntity;
 import com.sunny.scm.warehouse.constant.ZoneType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
 @Table(name = "zones")
 @AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Getter
 @Builder
@@ -22,6 +20,8 @@ public class Zone extends BaseEntity {
     String zoneCode;
     @Column(name = "zone_name", nullable = false)
     String zoneName;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "zone_type")
     ZoneType zoneType;
 

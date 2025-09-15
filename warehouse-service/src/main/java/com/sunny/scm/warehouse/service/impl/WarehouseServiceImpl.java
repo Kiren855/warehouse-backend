@@ -16,12 +16,13 @@ import com.sunny.scm.warehouse.service.SequenceService;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -29,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -38,6 +38,22 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final LoggingProducer loggingProducer;
     private final SequenceService sequenceService;
+
+    @Override
+    @Cacheable(value = "warehouse_detail", key = "#warehouseId")
+    public WarehouseResponse getWarehouse(Long warehouseId) {
+        Warehouse warehouse = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
+
+        return WarehouseResponse.builder()
+                .id(warehouse.getId())
+                .warehouseName(warehouse.getWarehouseName())
+                .warehouseCode(warehouse.getWarehouseCode())
+                .location(warehouse.getLocation())
+                .createdAt(warehouse.getCreationTimestamp())
+                .updatedAt(warehouse.getUpdateTimestamp()).build();
+    }
+
     @Override
     @Transactional
     public void createWarehouse(CreateWarehouseRequest request) {
@@ -59,6 +75,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @CacheEvict(value = "warehouse_detail", key = "#warehouseId")
     public void updateWarehouse(Long warehouseId, UpdateWarehouseRequest request) {
         Warehouse warehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
@@ -77,6 +94,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Cacheable(value = "warehouse_detail", key = "#warehouseId")
     public void deleteWarehouse(Long warehouseId) {
         Warehouse warehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));

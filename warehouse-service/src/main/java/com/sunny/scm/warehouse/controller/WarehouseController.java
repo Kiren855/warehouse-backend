@@ -21,6 +21,18 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
 
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
+    @GetMapping("/{warehouseId}")
+    public ResponseEntity<?> getWarehouse(@PathVariable Long warehouseId) {
+        var response = warehouseService.getWarehouse(warehouseId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_WAREHOUSE_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
+                    .build());
+    }
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
     @GetMapping()
     public ResponseEntity<?> getWarehouses(
             @RequestParam(required = false) String keyword,

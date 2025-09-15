@@ -8,6 +8,7 @@ import com.sunny.scm.warehouse.dto.warehouse.WarehouseResponse;
 import java.time.LocalDate;
 
 public interface WarehouseService {
+    WarehouseResponse getWarehouse(Long warehouseId);
     void createWarehouse(CreateWarehouseRequest request);
     void updateWarehouse(Long warehouseId, UpdateWarehouseRequest request);
     void deleteWarehouse(Long warehouseId);
