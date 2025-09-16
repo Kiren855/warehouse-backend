@@ -32,7 +32,7 @@ public class GoodReceipt extends BaseEntity {
     @Column(name = "source_type", nullable = false)
     SourceType sourceType;
 
-    @Column(name = "source_id", nullable = false)
+    @Column(name = "source_id")
     Long sourceId;
 
     @Enumerated(EnumType.STRING)

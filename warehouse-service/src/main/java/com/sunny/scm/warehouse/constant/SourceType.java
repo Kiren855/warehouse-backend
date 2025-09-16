@@ -1,5 +1,8 @@
 package com.sunny.scm.warehouse.constant;
 
 public enum SourceType {
-    SUPPLIER, PRODUCTION
+    PURCHASE_ORDER,
+    PRODUCTION,
+    TRANSFER,
+    RETURN,
 }

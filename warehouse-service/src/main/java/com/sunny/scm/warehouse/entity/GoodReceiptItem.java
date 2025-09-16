@@ -21,5 +21,6 @@ public class GoodReceiptItem extends BaseEntity {
     @JoinColumn(name = "good_receipt_id", nullable = false)
     GoodReceipt goodReceipt;
 
-    Integer quantity;
+    @Column(name = "package_quantity", nullable = false)
+    Integer packageQuantity;
 }

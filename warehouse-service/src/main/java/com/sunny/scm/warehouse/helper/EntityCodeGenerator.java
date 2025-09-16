@@ -12,4 +12,12 @@ public class EntityCodeGenerator {
     public static String generateBinCode(String zoneCode, Long sequence) {
         return String.format("%s-BC-%03d", zoneCode, sequence);
     }
+
+    public static String generateReceiptNumber(Long companyId, Long sequence) {
+        return String.format("RCPT-%s-%08d", companyId, sequence);
+    }
+
+    public static String generateIssueNumber(Long companyId, Long sequence) {
+        return String.format("ISS-%s-%08d", companyId, sequence);
+    }
 }

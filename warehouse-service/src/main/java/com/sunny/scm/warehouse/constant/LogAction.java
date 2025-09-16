@@ -9,7 +9,9 @@ public enum LogAction {
     DELETE_ZONE("Delete zone with code %s"),
     CREATE_BIN("Create bin with code %s"),
     UPDATE_BIN("Update bin with code %s"),
-    DELETE_BIN("Delete bin with code %s")
+    DELETE_BIN("Delete bin with code %s"),
+    CREATE_RECEIPT("Create receipt with number %s"),
+
     ;
     String value;
     LogAction(String value) {
