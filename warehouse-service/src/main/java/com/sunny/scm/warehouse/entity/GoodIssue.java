@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -16,7 +17,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-@Table(name = "good_issues")
+@Table(name = "good_issues",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"company_id", "issue_number"})
+    }
+)
 public class GoodIssue extends BaseEntity {
     @Column(name = "company_id", nullable = false)
     Long companyId;
@@ -37,4 +42,11 @@ public class GoodIssue extends BaseEntity {
 
     @Column(name = "issue_date")
     LocalDateTime issueDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouse_id", nullable = false)
+    Warehouse warehouse;
+
+    @OneToMany(mappedBy = "goodIssue", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<GoodIssueItem> items;
 }

@@ -17,7 +17,11 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "good_receipts")
+@Table(name = "good_receipts",
+         uniqueConstraints = {
+              @UniqueConstraint(columnNames = {"company_id", "receipt_number"})
+         }
+)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GoodReceipt extends BaseEntity {
     @Column(name = "company_id", nullable = false)
@@ -37,6 +41,10 @@ public class GoodReceipt extends BaseEntity {
 
     @Column(name = "receipt_date")
     LocalDateTime receiptDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouse_id", nullable = false)
+    Warehouse warehouse;
 
     @OneToMany(mappedBy = "goodReceipt", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<GoodReceiptItem> items;
