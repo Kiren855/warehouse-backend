@@ -87,11 +87,11 @@ public class ZoneServiceImpl implements ZoneService {
         Zone zone = zoneRepository.findById(zoneId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.ZONE_NOT_FOUND));
 
-        if(!request.getZoneName().isEmpty()) {
+        if(request.getZoneName() != null) {
            zone.setZoneName(request.getZoneName());
         }
 
-        if(!request.getZoneType().isEmpty()) {
+        if(request.getZoneType() != null) {
             zone.setZoneType(ZoneType.valueOf(request.getZoneType().toUpperCase()));
         }
 
@@ -119,8 +119,8 @@ public class ZoneServiceImpl implements ZoneService {
             Long warehouseId,
             String keyword,
             ZoneType zoneType,
-            LocalDate createdFrom,
-            LocalDate createdTo,
+            LocalDate updatedFrom,
+            LocalDate updatedTo,
             int page, int size,
             String sort
     ) {
@@ -135,7 +135,7 @@ public class ZoneServiceImpl implements ZoneService {
         Specification<Zone> spec = ZoneSpecifications.belongsToWarehouse(warehouseId)
                 .and(ZoneSpecifications.likeCodeOrName(keyword))
                 .and(ZoneSpecifications.hasZoneType(zoneType))
-                .and(ZoneSpecifications.createdBetween(createdFrom, createdTo));
+                .and(ZoneSpecifications.updatedBetween(updatedFrom, updatedTo));
 
         Page<Zone> zones = zoneRepository.findAll(spec, pageable);
 

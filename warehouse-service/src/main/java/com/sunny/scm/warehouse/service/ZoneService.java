@@ -20,8 +20,8 @@ public interface ZoneService {
             Long warehouseId,
             String keyword,
             ZoneType zoneType,
-            LocalDate createdFrom,
-            LocalDate createdTo,
+            LocalDate updatedFrom,
+            LocalDate updatedTo,
             int page,
             int size,
             String sort);

@@ -16,8 +16,8 @@ public class ZoneSpecifications {
         return SpecificationUtils.orLikeIgnoreCase(List.of("zoneCode", "zoneName"), keyword);
     }
 
-    public static Specification<Zone> createdBetween(LocalDate from, LocalDate to) {
-        return SpecificationUtils.betweenDate("creationTimestamp", from, to);
+    public static Specification<Zone> updatedBetween(LocalDate from, LocalDate to) {
+        return SpecificationUtils.betweenDate("updateTimestamp", from, to);
     }
 
     public static Specification<Zone> hasZoneType(ZoneType zoneType) {

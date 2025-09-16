@@ -29,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ public class BinServiceImpl implements BinService {
     private final SequenceService sequenceService;
     private final LoggingProducer loggingProducer;
     @Override
+    @Transactional
     public void createBin(Long zoneId, CreateBinRequest request) {
         Zone zone = zoneRepository.findById(zoneId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.ZONE_NOT_FOUND));
@@ -103,8 +105,9 @@ public class BinServiceImpl implements BinService {
     String keyword,
     BinType binType,
     BinStatus binStatus,
-    LocalDate createdFrom,
-    LocalDate createdTo,
+    String contentStatus,
+    LocalDate updatedFrom,
+    LocalDate updatedTo,
     int page, int size, String sort)
     {
         zoneRepository.findById(zoneId)
@@ -120,7 +123,8 @@ public class BinServiceImpl implements BinService {
                 .and(BinSpecifications.likeCodeOrName(keyword))
                 .and(BinSpecifications.hasBinType(binType))
                 .and(BinSpecifications.hasStatus(binStatus))
-                .and(BinSpecifications.createdBetween(createdFrom, createdTo));
+                .and(BinSpecifications.hasContentStatus(contentStatus))
+                .and(BinSpecifications.updatedBetween(updatedFrom, updatedTo));
 
         Page<Bin> bins = binRepository.findAll(spec, pageable);
         Page<BinResponse> binResponses = bins.map(BinResponse::toResponse);

@@ -2,7 +2,7 @@ package com.sunny.scm.warehouse.helper;
 
 public class EntityCodeGenerator {
     public static String generateWarehouseCode(Long companyId, Long sequence) {
-        return String.format("WH-%s-%06d", companyId, sequence);
+        return String.format("WH-%s-%03d", companyId, sequence);
     }
 
     public static String generateZoneCode(String warehouseCode, Long sequence) {

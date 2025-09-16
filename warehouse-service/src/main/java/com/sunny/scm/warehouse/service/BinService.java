@@ -19,8 +19,9 @@ public interface BinService {
             String keyword,
             BinType binType,
             BinStatus binStatus,
-            LocalDate createdFrom,
-            LocalDate createdTo,
+            String contentStatus,
+            LocalDate updatedFrom,
+            LocalDate updatedTo,
             int page,
             int size,
             String sort);

@@ -28,8 +28,8 @@ public class ZoneController {
     public ResponseEntity<?> getZones(
             @PathVariable Long warehouseId,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate updatedFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate updatedTo,
             @RequestParam(required = false) String zoneType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -40,7 +40,7 @@ public class ZoneController {
             type = ZoneType.valueOf(zoneType.toUpperCase());
         }
 
-        var response = zoneService.getZones(warehouseId, keyword, type, createdFrom, createdTo, page, size, sort);
+        var response = zoneService.getZones(warehouseId, keyword, type, updatedFrom, updatedTo, page, size, sort);
         WarehouseSuccessCode code = WarehouseSuccessCode.GET_ZONES_SUCCESS;
 
         return ResponseEntity.status(code.getHttpStatus())

@@ -81,13 +81,14 @@ public class BinController {
     public ResponseEntity<?> getBins(
             @PathVariable Long zoneId,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate updatedFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate updatedTo,
             @RequestParam(required = false) String binType,
             @RequestParam(required = false) String binStatus,
+            @RequestParam(required = false) String contentStatus,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "creationTimestamp,desc") String sort)
+            @RequestParam(defaultValue = "updateTimestamp,desc") String sort)
     {
         BinType type = null;
         if (binType != null && !binType.isBlank()) {
@@ -99,7 +100,7 @@ public class BinController {
             status = BinStatus.valueOf(binStatus.toUpperCase());
         }
 
-        var response = binService.getBins(zoneId, keyword, type, status, createdFrom, createdTo, page, size, sort);
+        var response = binService.getBins(zoneId, keyword, type, status, contentStatus, updatedFrom, updatedTo, page, size, sort);
         WarehouseSuccessCode code = WarehouseSuccessCode.GET_BINS_SUCCESS;
 
         return ResponseEntity.status(code.getHttpStatus())

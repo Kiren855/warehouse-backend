@@ -9,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class UpdateZoneRequest {
-    @JsonProperty("zone_code")
-    String zoneName;
     @JsonProperty("zone_name")
+    String zoneName;
+    @JsonProperty("zone_type")
     String zoneType;
 }

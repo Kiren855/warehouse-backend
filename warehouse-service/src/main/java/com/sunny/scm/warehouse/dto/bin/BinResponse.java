@@ -38,7 +38,8 @@ public class BinResponse {
     @JsonProperty("current_volume")
     BigDecimal currentVolume;
 
-    String status;
+    @JsonProperty("bin_status")
+    String binStatus;
 
     @JsonProperty("create_at")
     LocalDateTime createdAt;
@@ -55,7 +56,7 @@ public class BinResponse {
                 .binCode(bin.getBinCode())
                 .binName(bin.getBinName())
                 .binType(bin.getBinType().toString())
-                .status(bin.getBinStatus().toString())
+                .binStatus(bin.getBinStatus().toString())
                 .length(bin.getLength())
                 .width(bin.getWidth())
                 .height(bin.getHeight())

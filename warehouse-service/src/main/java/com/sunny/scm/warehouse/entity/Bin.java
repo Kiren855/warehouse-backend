@@ -24,7 +24,7 @@ public class Bin extends BaseEntity {
     @JoinColumn(name = "zone_id", nullable = false)
     Zone zone;
 
-    @Column(name = "code", length = 20, nullable = false)
+    @Column(name = "code", length = 30, nullable = false)
     String binCode;
 
     @Column(name = "name", length = 100, nullable = false)
