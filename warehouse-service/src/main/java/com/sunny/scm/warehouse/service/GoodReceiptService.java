@@ -16,6 +16,7 @@ public interface GoodReceiptService {
     void processGoodReceipt(Long receiptId);
     void completeGoodReceipt(Long receiptId);
     void changeGoodReceiptStatus(Long warehouseId, Long receiptId, String status);
+    void cancelGoodReceiptStatus(Long warehouseId, Long receiptId);
 
     PageResponse<ReceiptResponse> getReceipts(
             Long warehouseId,

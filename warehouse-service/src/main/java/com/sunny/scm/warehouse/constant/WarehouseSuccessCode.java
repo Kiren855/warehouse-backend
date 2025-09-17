@@ -23,7 +23,8 @@ public enum WarehouseSuccessCode implements BaseCodeError {
     GET_GOOD_RECEIPTS_SUCCESS("S30018", "Get good receipts success", HttpStatus.OK),
     CHANGE_GOOD_RECEIPT_STATUS_SUCCESS("S30019", "Change good receipt status success", HttpStatus.OK),
     CREATE_GROUP_RECEIPT_SUCCESS("S30020", "Create group receipt success", HttpStatus.OK),
-    GET_GROUP_RECEIPT_SUCCESS("S30021", "Get group receipt success", HttpStatus.OK),;
+    GET_GROUP_RECEIPT_SUCCESS("S30021", "Get group receipt success", HttpStatus.OK),
+    CANCEL_GOOD_RECEIPT_SUCCESS("S30022", "Cancel good receipt success", HttpStatus.OK),;
     String code;
     String message;
     HttpStatus httpStatus;

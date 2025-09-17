@@ -219,4 +219,34 @@ public class WarehouseController {
                     .result(response)
                     .build());
     }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CANCEL_RECEIPT", "ALL_PERMISSIONS"})
+    @PostMapping("{warehouseId}/good-receipts/{receiptId}/cancel")
+    public ResponseEntity<?> cancelReceipt(
+        @PathVariable Long warehouseId,
+        @PathVariable Long receiptId
+    ) {
+        goodReceiptService.cancelGoodReceiptStatus(warehouseId, receiptId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.CANCEL_GOOD_RECEIPT_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CANCEL_RECEIPT", "GROUP_RECEIPT", "ALL_PERMISSIONS"})
+    @PostMapping("{warehouseId}/group-receipts/{groupId}/cancel")
+    public ResponseEntity<?> cancelGroupReceipt(
+        @PathVariable Long warehouseId,
+        @PathVariable Long groupId
+    ) {
+        groupReceiptService.cancelGroupStatus(warehouseId, groupId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.CANCEL_GOOD_RECEIPT_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .build());
+    }
 }

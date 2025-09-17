@@ -10,5 +10,4 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface GroupReceiptRepository extends JpaRepository<GroupReceipt, Long>,
         JpaSpecificationExecutor<GroupReceipt> {
-    Page<GroupReceipt> findAllByWarehouseId(Long warehouseId, int page, int size);
 }

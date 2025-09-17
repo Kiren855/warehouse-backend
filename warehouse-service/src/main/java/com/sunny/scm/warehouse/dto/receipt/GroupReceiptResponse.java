@@ -21,6 +21,9 @@ public class GroupReceiptResponse {
 
     @JsonProperty("total_receipts")
     Integer totalReceipts;
+
+    String status;
+
     @JsonProperty("created_at")
     LocalDateTime createdAt;
 }

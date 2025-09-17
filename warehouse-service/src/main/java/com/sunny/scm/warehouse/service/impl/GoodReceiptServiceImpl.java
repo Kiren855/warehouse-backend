@@ -129,6 +129,20 @@ public class GoodReceiptServiceImpl implements GoodReceiptService {
     }
 
     @Override
+    public void cancelGoodReceiptStatus(Long warehouseId, Long receiptId) {
+        warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
+
+        GoodReceipt goodReceipt = receiptRepository.findById(receiptId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.RECEIPT_NOT_FOUND));
+
+        goodReceipt.setReceiptStatus(ReceiptStatus.CANCELLED);
+        receiptRepository.save(goodReceipt);
+        String action = LogAction.CANCEL_RECEIPT.format(goodReceipt.getReceiptNumber());
+        loggingProducer.sendMessage(action);
+    }
+
+    @Override
     public PageResponse<ReceiptResponse> getReceipts(
     Long warehouseId,
     String keyword, SourceType sourceType,
@@ -137,7 +151,7 @@ public class GoodReceiptServiceImpl implements GoodReceiptService {
     {
         Specification<GoodReceipt> spec = ReceiptSpecifications.belongsToWarehouse(warehouseId)
                 .and(ReceiptSpecifications.likeReceiptNumber(keyword))
-                .and(ReceiptSpecifications.hasStatus(ReceiptStatus.PENDING))
+                .and(ReceiptSpecifications.hasStatus(receiptStatus))
                 .and(ReceiptSpecifications.hasSourceType(sourceType));
 
         Page<GoodReceipt> receiptsPage = receiptRepository.findAll(spec, PageRequest.of(page, size));

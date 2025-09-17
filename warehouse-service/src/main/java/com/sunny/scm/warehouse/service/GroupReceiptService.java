@@ -10,4 +10,6 @@ public interface GroupReceiptService {
     PageResponse<GroupReceiptResponse> getGroupReceipts(Long warehouseId,
     String keyword, String status, int page, int size);
 
+    void cancelGroupStatus(Long warehouseId, Long groupId);
+
 }

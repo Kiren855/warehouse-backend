@@ -45,8 +45,6 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
 
         Set<GoodReceipt> receipts = receiptRepository.findAllByIdIn(request.getReceiptIds());
 
-        receipts.forEach(r -> r.setReceiptStatus(ReceiptStatus.CONFIRM));
-
         if (receipts.size() != request.getReceiptIds().size()) {
             throw new AppException(WarehouseErrorCode.RECEIPT_NOT_FOUND);
         }
@@ -55,9 +53,14 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
         GroupReceipt newGroupReceipt = GroupReceipt.builder()
                 .warehouse(warehouse)
                 .groupCode(groupCode)
-                .receiptStatus(ReceiptStatus.CONFIRM)
+                .receiptStatus(ReceiptStatus.CONFIRMED)
                 .receipts(receipts)
                 .build();
+
+        receipts.forEach(r -> {
+            r.setReceiptStatus(ReceiptStatus.CONFIRMED);
+            r.setGroupReceipt(newGroupReceipt);
+        });
 
         groupReceiptRepository.save(newGroupReceipt);
         String action = LogAction.CREATE_GROUP_RECEIPT.format(newGroupReceipt.getGroupCode());
@@ -84,9 +87,30 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
                         .id(groupReceipt.getId())
                         .groupCode(groupReceipt.getGroupCode())
                         .totalReceipts(groupReceipt.getReceipts().size())
+                        .status(groupReceipt.getReceiptStatus().name())
                         .createdAt(groupReceipt.getCreationTimestamp())
                         .build());
 
         return PageResponse.from(groupResponses);
+    }
+
+    @Override
+    public void cancelGroupStatus(Long warehouseId, Long groupId) {
+        warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
+
+        GroupReceipt groupReceipt = groupReceiptRepository.findById(groupId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.GROUP_RECEIPT_NOT_FOUND));
+
+        if (groupReceipt.getReceiptStatus() == ReceiptStatus.CANCELLED) {
+            throw new AppException(WarehouseErrorCode.GROUP_RECEIPT_ALREADY_CANCELLED);
+        }
+
+        groupReceipt.setReceiptStatus(ReceiptStatus.CANCELLED);
+        groupReceipt.getReceipts().forEach(r -> r.setReceiptStatus(ReceiptStatus.CANCELLED));
+        groupReceiptRepository.save(groupReceipt);
+
+        String action = LogAction.CANCEL_GROUP_RECEIPT.format(groupReceipt.getGroupCode());
+        loggingProducer.sendMessage(action);
     }
 }
