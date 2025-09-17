@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -127,5 +128,23 @@ public class PackageServiceImpl implements PackageService {
                         .build());
 
         return PageResponse.from(packages);
+    }
+
+    @Override
+    public List<PackageResponse> getAllPackages(Long productId) {
+        return packageRepository
+                .findAllByProductId(productId)
+                .stream()
+                .map(productPackage -> PackageResponse.builder()
+                        .id(productPackage.getId())
+                        .packageType(productPackage.getPackageType().name())
+                        .width(productPackage.getWidth())
+                        .length(productPackage.getLength())
+                        .height(productPackage.getHeight())
+                        .weight(productPackage.getWeight())
+                        .barcode(productPackage.getBarcode())
+                        .quantityInParent(productPackage.getQuantityInParent())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

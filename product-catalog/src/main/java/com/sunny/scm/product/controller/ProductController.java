@@ -7,6 +7,7 @@ import com.sunny.scm.product.dto.product.*;
 import com.sunny.scm.product.service.PackageService;
 import com.sunny.scm.product.service.ProductService;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -144,6 +145,38 @@ public class ProductController {
 
         var packages = packageService.getPackages(productId, page, size);
         ProductSuccessCode code = ProductSuccessCode.GET_PACKAGES_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .result(packages)
+                .build();
+
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CREATE_RECEIPT", "ALL_PERMISSIONS"})
+    @GetMapping("/warehouse")
+    public ResponseEntity<?> getProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size)
+    {
+        var products = productService.getProducts(keyword, page, size);
+        ProductSuccessCode code = ProductSuccessCode.GET_PRODUCTS_SUCCESS;
+        ApiResponse<?> apiResponse = ApiResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .result(products)
+                .build();
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CREATE_RECEIPT", "ALL_PERMISSIONS"})
+    @GetMapping("/{productId}/packages/all")
+    public ResponseEntity<?> getAllPackages(@PathVariable Long productId) {
+        var packages = packageService.getAllPackages(productId);
+        ProductSuccessCode code = ProductSuccessCode.GET_ALL_PACKAGES_SUCCESS;
+
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(code.getCode())
                 .message(code.getMessage())

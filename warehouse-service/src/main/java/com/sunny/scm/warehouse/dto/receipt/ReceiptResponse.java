@@ -1,4 +1,4 @@
-package com.sunny.scm.warehouse.dto.warehouse;
+package com.sunny.scm.warehouse.dto.receipt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -14,21 +14,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class WarehouseResponse {
-    Long id;
-    @JsonProperty("warehouse_code")
-    String warehouseCode;
-    @JsonProperty("warehouse_name")
-    String warehouseName;
-    String location;
+public class ReceiptResponse {
+    @JsonProperty("receipt_number")
+    String receiptNumber;
 
-    Double latitude;
-    Double longitude;
+    @JsonProperty("source_type")
+    String sourceType;
+
+    @JsonProperty("receipt_status")
+    String receiptStatus;
+
 
     @JsonProperty("create_at")
     LocalDateTime createdAt;
     @JsonProperty("update_at")
     LocalDateTime updatedAt;
-
-    String status;
 }

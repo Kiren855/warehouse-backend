@@ -5,8 +5,10 @@ import com.sunny.scm.grpc_common.aop.CheckPermission;
 import com.sunny.scm.warehouse.constant.WarehouseStatus;
 import com.sunny.scm.warehouse.constant.WarehouseSuccessCode;
 import com.sunny.scm.warehouse.constant.ZoneType;
+import com.sunny.scm.warehouse.dto.receipt.CreateGoodReceiptRequest;
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
+import com.sunny.scm.warehouse.service.GoodReceiptService;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class WarehouseController {
     private final WarehouseService warehouseService;
+    private final GoodReceiptService goodReceiptService;
 
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
     @GetMapping("/{warehouseId}")
@@ -34,6 +37,7 @@ public class WarehouseController {
                     .result(response)
                     .build());
     }
+
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
     @GetMapping()
     public ResponseEntity<?> getWarehouses(
@@ -102,4 +106,19 @@ public class WarehouseController {
                     .build());
     }
 
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CREATE_RECEIPT", "ALL_PERMISSIONS"})
+    @PostMapping("/{warehouseId}/good-receipts")
+    public ResponseEntity<?> createGoodReceiptManual(
+            @PathVariable Long warehouseId,
+            @Valid @RequestBody CreateGoodReceiptRequest request)
+    {
+        goodReceiptService.createGoodReceiptManual(warehouseId, request);
+        WarehouseSuccessCode code = WarehouseSuccessCode.CREATE_GOOD_RECEIPT_SUCCESS;
+
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .build());
+    }
 }
