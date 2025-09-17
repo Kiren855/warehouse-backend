@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="grpc-clients" />
         <module name="product-catalog" />
         <module name="common" />
         <module name="warehouse-service" />
@@ -23,6 +24,7 @@
       <module name="common" options="-parameters" />
       <module name="discoveryserver" options="-parameters" />
       <module name="gateway-service" options="-parameters" />
+      <module name="grpc-clients" options="-parameters" />
       <module name="grpc-common" options="-parameters" />
       <module name="identity-service" options="-parameters" />
       <module name="logging-service" options="-parameters" />

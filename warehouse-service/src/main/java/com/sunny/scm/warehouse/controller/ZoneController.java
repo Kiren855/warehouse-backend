@@ -2,10 +2,9 @@ package com.sunny.scm.warehouse.controller;
 
 
 import com.sunny.scm.common.dto.ApiResponse;
-import com.sunny.scm.grpc_common.aop.CheckPermission;
+import com.sunny.scm.grpc_clients.aop.CheckPermission;
 import com.sunny.scm.warehouse.constant.WarehouseSuccessCode;
 import com.sunny.scm.warehouse.constant.ZoneType;
-import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.zone.CreateZoneRequest;
 import com.sunny.scm.warehouse.dto.zone.UpdateZoneRequest;
 import com.sunny.scm.warehouse.service.ZoneService;

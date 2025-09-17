@@ -7,7 +7,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = {
 		"com.sunny.scm.common",
-		"com.sunny.scm.warehouse"
+		"com.sunny.scm.warehouse",
+		"com.sunny.scm.grpc_common"
 })
 public class WarehouseServiceApplication {
 

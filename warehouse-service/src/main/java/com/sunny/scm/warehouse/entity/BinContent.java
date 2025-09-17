@@ -23,8 +23,8 @@ public class BinContent extends BaseEntity {
     @JoinColumn(name = "bin_id", nullable = false)
     Bin bin;
 
-    @Column(name = "product_id")
-    Long productId;
+    @Column(name = "product_package_id", nullable = false)
+    Long productPackageId;
 
     @Column(name = "quantity", nullable = false)
     Integer quantity;

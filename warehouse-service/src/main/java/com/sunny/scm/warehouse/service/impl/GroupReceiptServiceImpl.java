@@ -2,19 +2,19 @@ package com.sunny.scm.warehouse.service.impl;
 
 import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.exception.AppException;
+import com.sunny.scm.grpc.product.ProductPackageRpc;
+import com.sunny.scm.warehouse.client.ProductCatalogClient;
 import com.sunny.scm.warehouse.constant.LogAction;
 import com.sunny.scm.warehouse.constant.ReceiptStatus;
 import com.sunny.scm.warehouse.constant.WarehouseErrorCode;
-import com.sunny.scm.warehouse.dto.receipt.GroupReceiptRequest;
-import com.sunny.scm.warehouse.dto.receipt.GroupReceiptResponse;
-import com.sunny.scm.warehouse.dto.receipt.ReceiptResponse;
+import com.sunny.scm.warehouse.dto.receipt.*;
 import com.sunny.scm.warehouse.entity.GoodReceipt;
 import com.sunny.scm.warehouse.entity.GroupReceipt;
 import com.sunny.scm.warehouse.entity.Warehouse;
 import com.sunny.scm.warehouse.event.LoggingProducer;
 import com.sunny.scm.warehouse.helper.EntityCodeGenerator;
 import com.sunny.scm.warehouse.helper.GroupReceiptSpecifications;
-import com.sunny.scm.warehouse.helper.ReceiptSpecifications;
+import com.sunny.scm.warehouse.repository.GoodReceiptItemRepository;
 import com.sunny.scm.warehouse.repository.GroupReceiptRepository;
 import com.sunny.scm.warehouse.repository.ReceiptRepository;
 import com.sunny.scm.warehouse.repository.WarehouseRepository;
@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -35,8 +36,10 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
     private final GroupReceiptRepository groupReceiptRepository;
     private final WarehouseRepository warehouseRepository;
     private final ReceiptRepository receiptRepository;
+    private final GoodReceiptItemRepository goodReceiptItemRepository;
     private final SequenceService sequenceService;
     private final LoggingProducer loggingProducer;
+    private final ProductCatalogClient productCatalogClient;
     @Override
     @Transactional
     public void processGroupReceipts(Long warehouseId, GroupReceiptRequest request) {
@@ -113,4 +116,18 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
         String action = LogAction.CANCEL_GROUP_RECEIPT.format(groupReceipt.getGroupCode());
         loggingProducer.sendMessage(action);
     }
+
+    @Override
+    public List<ProductPackageResponse> getQuery(Long groupReceiptId) {
+        List<GroupedPackageDto> groupedPackageDto = goodReceiptItemRepository.findGroupedItemsByGroupReceiptId(groupReceiptId);
+        List<Long> packageIds = groupedPackageDto.stream()
+                .map(GroupedPackageDto::getProductPackageId)
+                .toList();
+        List<ProductPackageRpc> list = productCatalogClient.getProductPackages(packageIds);
+        return list.stream()
+                .map(ProductPackageResponse::fromRpc)
+                .toList();
+    }
+
+
 }

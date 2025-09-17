@@ -1,0 +1,15 @@
+package com.sunny.scm.warehouse.dto.receipt;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class GroupedPackageDto {
+    Long productPackageId;
+    Long totalQuantity;
+}

@@ -1,7 +1,7 @@
 package com.sunny.scm.warehouse.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
-import com.sunny.scm.grpc_common.aop.CheckPermission;
+import com.sunny.scm.grpc_clients.aop.CheckPermission;
 import com.sunny.scm.warehouse.constant.*;
 import com.sunny.scm.warehouse.dto.receipt.ChangeReceiptStatusRequest;
 import com.sunny.scm.warehouse.dto.receipt.CreateGoodReceiptRequest;
@@ -247,6 +247,22 @@ public class WarehouseController {
             .body(ApiResponse.builder()
                     .code(code.getCode())
                     .message(code.getMessage())
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "GROUP_RECEIPT", "ALL_PERMISSIONS"})
+    @GetMapping("{warehouseId}/group-receipts/{groupReceiptId}/packages")
+    public ResponseEntity<?> getGroupedPackages(
+        @PathVariable Long warehouseId,
+        @PathVariable Long groupReceiptId
+    ) {
+        var response = groupReceiptService.getQuery(groupReceiptId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_GROUPED_PACKAGES_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
                     .build());
     }
 }

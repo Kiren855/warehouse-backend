@@ -4,11 +4,6 @@ import com.sunny.scm.common.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor

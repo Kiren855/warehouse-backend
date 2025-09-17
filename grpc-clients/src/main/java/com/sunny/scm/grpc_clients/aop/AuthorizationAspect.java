@@ -1,6 +1,6 @@
-package com.sunny.scm.grpc_common.aop;
+package com.sunny.scm.grpc_clients.aop;
 
-import com.sunny.scm.grpc_common.client.AuthorizationClient;
+import com.sunny.scm.grpc_clients.client.AuthorizationClient;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.exception.AppException;
 import lombok.extern.slf4j.Slf4j;

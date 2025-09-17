@@ -1,13 +1,12 @@
 package com.sunny.scm.product.controller;
 
-import com.sunny.scm.grpc_common.aop.CheckPermission;
+import com.sunny.scm.grpc_clients.aop.CheckPermission;
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.product.constant.ProductSuccessCode;
 import com.sunny.scm.product.dto.product.*;
 import com.sunny.scm.product.service.PackageService;
 import com.sunny.scm.product.service.ProductService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

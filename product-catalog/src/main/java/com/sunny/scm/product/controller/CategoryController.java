@@ -1,7 +1,7 @@
 package com.sunny.scm.product.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
-import com.sunny.scm.grpc_common.aop.CheckPermission;
+import com.sunny.scm.grpc_clients.aop.CheckPermission;
 import com.sunny.scm.product.constant.ProductSuccessCode;
 import com.sunny.scm.product.dto.category.CreateCategoryRequest;
 import com.sunny.scm.product.service.CategoryService;

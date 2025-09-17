@@ -1,4 +1,4 @@
-package com.sunny.scm.grpc_common.client;
+package com.sunny.scm.grpc_clients.client;
 
 import identity.AuthorizationServiceGrpc;
 import identity.AuthorizationServiceOuterClass.CheckPermissionRequest;
