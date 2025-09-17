@@ -5,10 +5,7 @@ import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.PackageType;
 import com.sunny.scm.product.constant.ProductErrorCode;
-import com.sunny.scm.product.dto.product.CreatePackageRequest;
-import com.sunny.scm.product.dto.product.DeletePackageRequest;
-import com.sunny.scm.product.dto.product.PackageResponse;
-import com.sunny.scm.product.dto.product.UpdatePackageRequest;
+import com.sunny.scm.product.dto.product.*;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
 import com.sunny.scm.product.entity.ProductPackage;
@@ -146,5 +143,24 @@ public class PackageServiceImpl implements PackageService {
                         .quantityInParent(productPackage.getQuantityInParent())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageResponse<PackageDetailResponse> getPackagesByIds(List<Long> packageIds, int page, int size) {
+        Page<PackageDetailResponse> packages = packageRepository
+                .findAllByIdIn(packageIds, PageRequest.of(page, size))
+                .map(productPackage -> PackageDetailResponse.builder()
+                        .packageId(productPackage.getId())
+                        .packageType(productPackage.getPackageType().name())
+                        .width(productPackage.getWidth())
+                        .length(productPackage.getLength())
+                        .height(productPackage.getHeight())
+                        .weight(productPackage.getWeight())
+                        .barcode(productPackage.getBarcode())
+                        .productName(productPackage.getProduct().getProductName())
+                        .productSku(productPackage.getProduct().getProductSku())
+                        .build());
+
+        return PageResponse.from(packages);
     }
 }

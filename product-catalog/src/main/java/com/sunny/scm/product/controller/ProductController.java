@@ -171,7 +171,7 @@ public class ProductController {
         return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
 
-    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "CREATE_RECEIPT", "ALL_PERMISSIONS"})
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "ALL_PERMISSIONS"})
     @GetMapping("/{productId}/packages/all")
     public ResponseEntity<?> getAllPackages(@PathVariable Long productId) {
         var packages = packageService.getAllPackages(productId);

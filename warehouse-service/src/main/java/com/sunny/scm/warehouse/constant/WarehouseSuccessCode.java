@@ -19,7 +19,11 @@ public enum WarehouseSuccessCode implements BaseCodeError {
     DELETE_BIN_SUCCESS("S30014", "Delete bin success", HttpStatus.OK),
     GET_BINS_SUCCESS("S30015", "Get bins success", HttpStatus.OK),
     GET_BIN_SUCCESS("S30016", "Get bin success", HttpStatus.OK),
-    CREATE_GOOD_RECEIPT_SUCCESS("S30017", "Create good receipt success", HttpStatus.OK),;
+    CREATE_GOOD_RECEIPT_SUCCESS("S30017", "Create good receipt success", HttpStatus.OK),
+    GET_GOOD_RECEIPTS_SUCCESS("S30018", "Get good receipts success", HttpStatus.OK),
+    CHANGE_GOOD_RECEIPT_STATUS_SUCCESS("S30019", "Change good receipt status success", HttpStatus.OK),
+    CREATE_GROUP_RECEIPT_SUCCESS("S30020", "Create group receipt success", HttpStatus.OK),
+    GET_GROUP_RECEIPT_SUCCESS("S30021", "Get group receipt success", HttpStatus.OK),;
     String code;
     String message;
     HttpStatus httpStatus;

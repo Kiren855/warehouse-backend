@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 @Getter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ReceiptResponse {
+    @JsonProperty("receipt_id")
+    Long receiptId;
+
     @JsonProperty("receipt_number")
     String receiptNumber;
 
@@ -24,6 +28,10 @@ public class ReceiptResponse {
     @JsonProperty("receipt_status")
     String receiptStatus;
 
+    @JsonProperty("total_item")
+    int totalItem;
+
+    List<ReceiptItemResponse> items;
 
     @JsonProperty("create_at")
     LocalDateTime createdAt;

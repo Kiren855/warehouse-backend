@@ -48,4 +48,8 @@ public class GoodReceipt extends BaseEntity {
 
     @OneToMany(mappedBy = "goodReceipt", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<GoodReceiptItem> items;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    GroupReceipt groupReceipt;
 }

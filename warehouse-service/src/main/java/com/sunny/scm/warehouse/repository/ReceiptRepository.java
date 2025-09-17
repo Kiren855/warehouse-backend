@@ -5,5 +5,10 @@ import com.sunny.scm.warehouse.entity.Zone;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ReceiptRepository extends JpaRepository<GoodReceipt, Long>, JpaSpecificationExecutor<GoodReceipt> {
+import java.util.List;
+import java.util.Set;
+
+public interface ReceiptRepository extends JpaRepository<GoodReceipt, Long>,
+JpaSpecificationExecutor<GoodReceipt> {
+    Set<GoodReceipt> findAllByIdIn(List<Long> receiptIds);
 }

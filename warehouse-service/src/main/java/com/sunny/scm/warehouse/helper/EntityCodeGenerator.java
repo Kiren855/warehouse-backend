@@ -20,4 +20,8 @@ public class EntityCodeGenerator {
     public static String generateIssueNumber(Long companyId, Long sequence) {
         return String.format("ISS-%s-%08d", companyId, sequence);
     }
+
+    public static String generateGroupCode(Long warehouseId, Long sequence) {
+        return String.format("GRP-%s-%05d", warehouseId, sequence);
+    }
 }

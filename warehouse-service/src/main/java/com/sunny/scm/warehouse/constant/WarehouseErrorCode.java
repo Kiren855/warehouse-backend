@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 public enum WarehouseErrorCode implements BaseCodeError {
     WAREHOUSE_NOT_FOUND("E30001", "Warehouse not found", HttpStatus.NOT_FOUND),
     ZONE_NOT_FOUND("E30002", "Zone not found", HttpStatus.NOT_FOUND),
-    BIN_NOT_FOUND("E30003", "Bin not found", HttpStatus.NOT_FOUND),;
+    BIN_NOT_FOUND("E30003", "Bin not found", HttpStatus.NOT_FOUND),
+    RECEIPT_NOT_FOUND("E30004", "Receipt not found", HttpStatus.NOT_FOUND),;
     String code;
     String message;
     HttpStatus httpStatus;

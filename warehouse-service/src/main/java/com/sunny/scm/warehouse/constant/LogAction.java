@@ -1,5 +1,7 @@
 package com.sunny.scm.warehouse.constant;
 
+import jakarta.annotation.Resource;
+
 public enum LogAction {
     CREATE_WAREHOUSE("Create warehouse with code %s"),
     UPDATE_WAREHOUSE("Update warehouse with code %s"),
@@ -12,7 +14,8 @@ public enum LogAction {
     DELETE_BIN("Delete bin with code %s"),
     CREATE_RECEIPT("Create receipt with number %s"),
 
-    ;
+    CHANGE_RECEIPT_STATUS("Change receipt %s status to %s"),
+    CREATE_GROUP_RECEIPT("Create group receipt with code %s"),;
     String value;
     LogAction(String value) {
         this.value = value;

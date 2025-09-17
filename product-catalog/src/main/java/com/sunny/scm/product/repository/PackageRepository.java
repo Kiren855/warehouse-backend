@@ -10,4 +10,5 @@ import java.util.List;
 public interface PackageRepository extends JpaRepository<ProductPackage, Long> {
     Page<ProductPackage> findAllByProductId(Long productId, Pageable pageable);
     List<ProductPackage> findAllByProductId(Long productId);
+    Page<ProductPackage> findAllByIdIn(List<Long> ids, Pageable pageable);
 }

@@ -2,13 +2,14 @@ package com.sunny.scm.warehouse.controller;
 
 import com.sunny.scm.common.dto.ApiResponse;
 import com.sunny.scm.grpc_common.aop.CheckPermission;
-import com.sunny.scm.warehouse.constant.WarehouseStatus;
-import com.sunny.scm.warehouse.constant.WarehouseSuccessCode;
-import com.sunny.scm.warehouse.constant.ZoneType;
+import com.sunny.scm.warehouse.constant.*;
+import com.sunny.scm.warehouse.dto.receipt.ChangeReceiptStatusRequest;
 import com.sunny.scm.warehouse.dto.receipt.CreateGoodReceiptRequest;
+import com.sunny.scm.warehouse.dto.receipt.GroupReceiptRequest;
 import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.service.GoodReceiptService;
+import com.sunny.scm.warehouse.service.GroupReceiptService;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 public class WarehouseController {
     private final WarehouseService warehouseService;
     private final GoodReceiptService goodReceiptService;
+    private final GroupReceiptService groupReceiptService;
 
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
     @GetMapping("/{warehouseId}")
@@ -119,6 +121,102 @@ public class WarehouseController {
             .body(ApiResponse.builder()
                     .code(code.getCode())
                     .message(code.getMessage())
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "ALL_PERMISSIONS"})
+    @GetMapping("/{warehouseId}/good-receipts")
+    public ResponseEntity<?> getGoodReceipts(
+            @PathVariable Long warehouseId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sourceType,
+            @RequestParam(required = false) String receiptStatus,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size)
+    {
+        SourceType type = null;
+        if (sourceType != null && !sourceType.isBlank()) {
+            type = SourceType.valueOf(sourceType.toUpperCase());
+        }
+
+        ReceiptStatus status = null;
+        if (receiptStatus != null && !receiptStatus.isBlank()) {
+            status = ReceiptStatus.valueOf(receiptStatus.toUpperCase());
+        }
+
+        var response = goodReceiptService.getReceipts(warehouseId, keyword, type, status, page, size);
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_GOOD_RECEIPTS_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "ALL_PERMISSIONS"})
+    @GetMapping("/{warehouseId}/good-receipts/{receiptId}")
+    public ResponseEntity<?> getReceiptDetail(
+            @PathVariable Long warehouseId,
+            @PathVariable Long receiptId)
+    {
+        var response = goodReceiptService.getGoodReceipt(warehouseId, receiptId);
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_GOOD_RECEIPTS_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "PROCESS_RECEIPT", "ALL_PERMISSIONS"})
+    @PostMapping("{warehouseId}/good-receipts/{receiptId}/change-status")
+    public ResponseEntity<?> changeStatus(
+        @PathVariable Long warehouseId,
+        @PathVariable Long receiptId,
+        ChangeReceiptStatusRequest request
+    ) {
+        goodReceiptService.changeGoodReceiptStatus(warehouseId, receiptId, request.getStatus());
+        WarehouseSuccessCode code = WarehouseSuccessCode.CHANGE_GOOD_RECEIPT_STATUS_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "PROCESS_RECEIPT", "GROUP_RECEIPT", "ALL_PERMISSIONS"})
+    @PostMapping("{warehouseId}/group-receipts")
+    public ResponseEntity<?> processGroupReceipts(
+        @PathVariable Long warehouseId,
+        @RequestBody @Valid GroupReceiptRequest request
+    ) {
+        groupReceiptService.processGroupReceipts(warehouseId, request);
+        WarehouseSuccessCode code = WarehouseSuccessCode.CREATE_GROUP_RECEIPT_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .build());
+    }
+
+    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "GROUP_RECEIPT", "ALL_PERMISSIONS"})
+    @GetMapping("{warehouseId}/group-receipts")
+    public ResponseEntity<?> getGroupReceipts(
+        @PathVariable Long warehouseId,
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) String status,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        var response = groupReceiptService.getGroupReceipts(warehouseId, keyword, status, page, size);
+        WarehouseSuccessCode code = WarehouseSuccessCode.GET_GROUP_RECEIPT_SUCCESS;
+        return ResponseEntity.status(code.getHttpStatus())
+            .body(ApiResponse.builder()
+                    .code(code.getCode())
+                    .message(code.getMessage())
+                    .result(response)
                     .build());
     }
 }
