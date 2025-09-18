@@ -10,6 +10,7 @@ import com.sunny.scm.warehouse.dto.warehouse.CreateWarehouseRequest;
 import com.sunny.scm.warehouse.dto.warehouse.UpdateWarehouseRequest;
 import com.sunny.scm.warehouse.service.GoodReceiptService;
 import com.sunny.scm.warehouse.service.GroupReceiptService;
+import com.sunny.scm.warehouse.service.PutawayOptimizerService;
 import com.sunny.scm.warehouse.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
     private final GoodReceiptService goodReceiptService;
     private final GroupReceiptService groupReceiptService;
+    private final PutawayOptimizerService putawayOptimizerService;
 
     @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_WAREHOUSE", "ALL_PERMISSIONS"})
     @GetMapping("/{warehouseId}")
@@ -250,19 +252,20 @@ public class WarehouseController {
                     .build());
     }
 
-    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "GROUP_RECEIPT", "ALL_PERMISSIONS"})
-    @GetMapping("{warehouseId}/group-receipts/{groupReceiptId}/packages")
-    public ResponseEntity<?> getGroupedPackages(
-        @PathVariable Long warehouseId,
-        @PathVariable Long groupReceiptId
-    ) {
-        var response = groupReceiptService.getQuery(groupReceiptId);
-        WarehouseSuccessCode code = WarehouseSuccessCode.GET_GROUPED_PACKAGES_SUCCESS;
-        return ResponseEntity.status(code.getHttpStatus())
-            .body(ApiResponse.builder()
-                    .code(code.getCode())
-                    .message(code.getMessage())
-                    .result(response)
-                    .build());
-    }
+//    @CheckPermission(permission = {"WAREHOUSE_MANAGER", "VIEW_RECEIPT", "GROUP_RECEIPT", "ALL_PERMISSIONS"})
+//    @GetMapping("{warehouseId}/group-receipts/{groupReceiptId}/packages")
+//    public ResponseEntity<?> getGroupedPackages(
+//        @PathVariable Long warehouseId,
+//        @PathVariable Long groupReceiptId
+//    ) {
+//        var response = putawayOptimizerService.optimizePutawaySuggestions(warehouseId, groupReceiptId);
+//
+//        WarehouseSuccessCode code = WarehouseSuccessCode.GET_GROUPED_PACKAGES_SUCCESS;
+//        return ResponseEntity.status(code.getHttpStatus())
+//            .body(ApiResponse.builder()
+//                    .code(code.getCode())
+//                    .message(code.getMessage())
+//                    .result(response)
+//                    .build());
+//    }
 }

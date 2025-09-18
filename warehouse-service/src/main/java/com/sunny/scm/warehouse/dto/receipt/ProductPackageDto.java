@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductPackageResponse {
+public class ProductPackageDto {
     @JsonProperty("package_id")
     Long packageId;
     @JsonProperty("product_id")
@@ -32,9 +32,11 @@ public class ProductPackageResponse {
     String barcode;
     @JsonProperty("quantity_in_parent")
     Integer quantityInParent;
+    @JsonProperty("total_quantity")
+    int totalQuantity;
 
-    public static ProductPackageResponse fromRpc(ProductPackageRpc rpc) {
-        return ProductPackageResponse.builder()
+    public static ProductPackageDto fromRpc(ProductPackageRpc rpc) {
+        return ProductPackageDto.builder()
                 .packageId(rpc.getPackageId())
                 .productId(rpc.getProductId())
                 .productSku(rpc.getProductSku())
@@ -46,10 +48,18 @@ public class ProductPackageResponse {
                 .weight(toBigDecimal(rpc.getWeight()))
                 .barcode(rpc.getBarcode())
                 .quantityInParent(rpc.getQuantityInParent())
+                .totalQuantity(rpc.getTotalQuantity())
                 .build();
     }
 
     private static BigDecimal toBigDecimal(String value) {
         return (value == null || value.isBlank()) ? null : new BigDecimal(value);
+    }
+
+    public BigDecimal getVolume() {
+        if (length == null || width == null || height == null) {
+            return null;
+        }
+        return length.multiply(width).multiply(height);
     }
 }

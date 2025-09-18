@@ -9,7 +9,8 @@ public enum WarehouseErrorCode implements BaseCodeError {
     BIN_NOT_FOUND("E30003", "Bin not found", HttpStatus.NOT_FOUND),
     RECEIPT_NOT_FOUND("E30004", "Receipt not found", HttpStatus.NOT_FOUND),
     GROUP_RECEIPT_NOT_FOUND("E30005", "Group receipt not found", HttpStatus.NOT_FOUND),
-    GROUP_RECEIPT_ALREADY_CANCELLED("E30006", "Group receipt already cancelled", HttpStatus.BAD_REQUEST),;
+    GROUP_RECEIPT_ALREADY_CANCELLED("E30006", "Group receipt already cancelled", HttpStatus.BAD_REQUEST),
+    PUTAWAY_PDF_NOT_FOUND("E30007", "Putaway PDF not found", HttpStatus.NOT_FOUND),;
     String code;
     String message;
     HttpStatus httpStatus;

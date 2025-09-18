@@ -58,4 +58,12 @@ public class Bin extends BaseEntity {
 
     @OneToMany(mappedBy = "bin", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<BinContent> binContents;
+
+    @Transient
+    public BigDecimal getMaxVolume() {
+        if (this.length != null && this.width != null && this.height != null) {
+            return this.length.multiply(this.width).multiply(this.height);
+        }
+        return BigDecimal.ZERO;
+    }
 }

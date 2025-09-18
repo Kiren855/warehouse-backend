@@ -50,6 +50,6 @@ public class GoodReceipt extends BaseEntity {
     Set<GoodReceiptItem> items;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_receipt_id")
     GroupReceipt groupReceipt;
 }

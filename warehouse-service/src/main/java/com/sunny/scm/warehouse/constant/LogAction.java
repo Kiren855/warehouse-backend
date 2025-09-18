@@ -17,7 +17,8 @@ public enum LogAction {
     CHANGE_RECEIPT_STATUS("Change receipt %s status to %s"),
     CREATE_GROUP_RECEIPT("Create group receipt with code %s"),
     CANCEL_RECEIPT("Cancel receipt with number %s"),
-    CANCEL_GROUP_RECEIPT("Cancel group receipt with code %s"), ;
+    CANCEL_GROUP_RECEIPT("Cancel group receipt with code %s"),
+    GENERATE_PUTAWAY_PDF("Generate putaway PDF for group receipt with code %s"),;
     String value;
     LogAction(String value) {
         this.value = value;

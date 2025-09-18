@@ -18,10 +18,16 @@ message ProductPackageRpc {
   string weight = 9;
   string barcode = 10;
   int32 quantity_in_parent = 11;
+  int32 total_quantity = 12;
+}
+
+message PackageQuantityRpc {
+  int64 package_id = 1;
+  int32 total_quantity = 2;
 }
 
 message GetProductPackagesRequest {
-  repeated int64 package_ids = 1;
+  repeated PackageQuantityRpc packages = 2;
 }
 
 message GetProductPackagesResponse {

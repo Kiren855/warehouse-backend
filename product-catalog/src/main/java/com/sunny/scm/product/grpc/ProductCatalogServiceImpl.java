@@ -1,10 +1,7 @@
 package com.sunny.scm.product.grpc;
 
 import com.sunny.scm.common.exception.AppException;
-import com.sunny.scm.grpc.product.GetProductPackagesRequest;
-import com.sunny.scm.grpc.product.GetProductPackagesResponse;
-import com.sunny.scm.grpc.product.ProductCatalogServiceGrpc;
-import com.sunny.scm.grpc.product.ProductPackageRpc;
+import com.sunny.scm.grpc.product.*;
 import com.sunny.scm.product.constant.ProductErrorCode;
 import com.sunny.scm.product.entity.ProductPackage;
 import com.sunny.scm.product.repository.PackageRepository;
@@ -13,6 +10,8 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +19,7 @@ import java.util.List;
 
 @GrpcService
 @RequiredArgsConstructor
+@Slf4j
 public class ProductCatalogServiceImpl extends ProductCatalogServiceGrpc.ProductCatalogServiceImplBase {
     private final PackageRepository packageRepository;
     private final ProductRepository productRepository;
@@ -29,12 +29,15 @@ public class ProductCatalogServiceImpl extends ProductCatalogServiceGrpc.Product
     public void getProductPackages(GetProductPackagesRequest request,
                                    StreamObserver<GetProductPackagesResponse> responseObserver) {
         try {
-            List<Long> packageIds = request.getPackageIdsList();
+            List<PackageQuantityRpc> packages = request.getPackagesList();
+            log.info("1. Received GetProductPackagesRequest with {} packages", packages.size());
+
             GetProductPackagesResponse.Builder responseBuilder = GetProductPackagesResponse.newBuilder();
 
-            packageIds.forEach(id -> {
-                ProductPackage packageProduct = packageRepository.findById(id)
+            packages.forEach(pack -> {
+                ProductPackage packageProduct = packageRepository.findById(pack.getPackageId())
                         .orElseThrow(() -> new AppException(ProductErrorCode.PACKAGE_NOT_EXIST));
+                log.info("2. Fetched ProductPackage with ID: {}", packageProduct.getId());
 
                 ProductPackageRpc packageRpc = ProductPackageRpc.newBuilder()
                         .setPackageId(packageProduct.getId())
@@ -48,6 +51,7 @@ public class ProductCatalogServiceImpl extends ProductCatalogServiceGrpc.Product
                         .setWeight(packageProduct.getWeight() != null ? packageProduct.getWeight().toPlainString() : "0")
                         .setBarcode(packageProduct.getBarcode())
                         .setQuantityInParent(packageProduct.getQuantityInParent())
+                        .setTotalQuantity(pack.getTotalQuantity())
                         .build();
 
                 responseBuilder.addProductPackages(packageRpc);
@@ -58,7 +62,6 @@ public class ProductCatalogServiceImpl extends ProductCatalogServiceGrpc.Product
             responseObserver.onCompleted();
 
         } catch (AppException e) {
-            // Map your custom exception to a gRPC status code (e.g., NOT_FOUND)
             Status status = Status.NOT_FOUND
                     .withDescription(e.getMessage());
             responseObserver.onError(status.asRuntimeException());

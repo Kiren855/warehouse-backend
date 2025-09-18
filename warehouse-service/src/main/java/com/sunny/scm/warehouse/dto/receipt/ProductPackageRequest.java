@@ -1,10 +1,12 @@
 package com.sunny.scm.warehouse.dto.receipt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 @Getter
+@Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductPackageRequest {
     @JsonProperty("product_package_id")

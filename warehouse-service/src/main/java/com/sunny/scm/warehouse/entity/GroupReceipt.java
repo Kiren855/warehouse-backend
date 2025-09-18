@@ -26,9 +26,13 @@ public class GroupReceipt extends BaseEntity {
     String groupCode;
 
     @OneToMany(mappedBy = "groupReceipt", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<GoodReceipt> receipts;
+    Set<GoodReceipt> receipts;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "receipt_status", nullable = false)
     ReceiptStatus receiptStatus;
+
+    @Column(name = "putaway_list_url")
+    private String putawayListUrl;
 }
+
