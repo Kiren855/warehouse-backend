@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package product;
+
+option java_multiple_files = true;
+option java_package = "com.sunny.scm.grpc.product";
+option java_outer_classname = "ProductCatalogServiceProto";
+
+message ProductPackageRpc {
+  int64 package_id = 1;
+  int64 product_id = 2;
+  string product_sku = 3;
+  string product_name = 4;
+  string package_type = 5;
+  string length = 6;
+  string width = 7;
+  string height = 8;
+  string weight = 9;
+  string barcode = 10;
+  int32 quantity_in_parent = 11;
+  int32 total_quantity = 12;
+}
+
+message PackageQuantityRpc {
+  int64 package_id = 1;
+  int32 total_quantity = 2;
+}
+
+message GetProductPackagesRequest {
+  repeated PackageQuantityRpc packages = 2;
+}
+
+message GetProductPackagesResponse {
+  repeated ProductPackageRpc product_packages = 1;
+}
+
+service ProductCatalogService {
+  rpc GetProductPackages(GetProductPackagesRequest) returns (GetProductPackagesResponse);
+}

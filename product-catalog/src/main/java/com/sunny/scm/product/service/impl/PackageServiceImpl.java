@@ -5,9 +5,7 @@ import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.PackageType;
 import com.sunny.scm.product.constant.ProductErrorCode;
-import com.sunny.scm.product.dto.product.CreatePackageRequest;
-import com.sunny.scm.product.dto.product.PackageResponse;
-import com.sunny.scm.product.dto.product.UpdatePackageRequest;
+import com.sunny.scm.product.dto.product.*;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
 import com.sunny.scm.product.entity.ProductPackage;
@@ -22,6 +20,10 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -88,15 +90,22 @@ public class PackageServiceImpl implements PackageService {
 
     @Override
     @CacheEvict(value = "product_details", key = "#productId")
-    public void deletePackage(Long productId, Long packageId) {
+    public void deletePackages(Long productId, DeletePackageRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ProductErrorCode.PRODUCT_NOT_EXIST));
 
-        ProductPackage productPackage = packageRepository.findById(packageId)
-                .orElseThrow(() -> new AppException(ProductErrorCode.PACKAGE_NOT_EXIST));
+        if(request.getPackageIds().isEmpty()) {
+           return;
+        }
+        Set<ProductPackage> packages = request.getPackageIds().stream()
+                .map(packageId -> packageRepository.findById(packageId)
+                        .orElseThrow(() -> new AppException(ProductErrorCode.PACKAGE_NOT_EXIST)))
+                .collect(Collectors.toSet());
 
-        packageRepository.delete(productPackage);
-        String action = LogAction.REMOVE_PRODUCT_PACKAGE.format(productPackage.getPackageType(), product.getProductSku());
+        product.getPackages().removeAll(packages);
+        productRepository.save(product);
+
+        String action = LogAction.REMOVE_PRODUCT_PACKAGE.format(packages.size(), product.getProductSku());
         loggingProducer.sendMessage(action);
     }
 
@@ -113,6 +122,43 @@ public class PackageServiceImpl implements PackageService {
                         .weight(productPackage.getWeight())
                         .barcode(productPackage.getBarcode())
                         .quantityInParent(productPackage.getQuantityInParent())
+                        .build());
+
+        return PageResponse.from(packages);
+    }
+
+    @Override
+    public List<PackageResponse> getAllPackages(Long productId) {
+        return packageRepository
+                .findAllByProductId(productId)
+                .stream()
+                .map(productPackage -> PackageResponse.builder()
+                        .id(productPackage.getId())
+                        .packageType(productPackage.getPackageType().name())
+                        .width(productPackage.getWidth())
+                        .length(productPackage.getLength())
+                        .height(productPackage.getHeight())
+                        .weight(productPackage.getWeight())
+                        .barcode(productPackage.getBarcode())
+                        .quantityInParent(productPackage.getQuantityInParent())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageResponse<PackageDetailResponse> getPackagesByIds(List<Long> packageIds, int page, int size) {
+        Page<PackageDetailResponse> packages = packageRepository
+                .findAllByIdIn(packageIds, PageRequest.of(page, size))
+                .map(productPackage -> PackageDetailResponse.builder()
+                        .packageId(productPackage.getId())
+                        .packageType(productPackage.getPackageType().name())
+                        .width(productPackage.getWidth())
+                        .length(productPackage.getLength())
+                        .height(productPackage.getHeight())
+                        .weight(productPackage.getWeight())
+                        .barcode(productPackage.getBarcode())
+                        .productName(productPackage.getProduct().getProductName())
+                        .productSku(productPackage.getProduct().getProductSku())
                         .build());
 
         return PageResponse.from(packages);

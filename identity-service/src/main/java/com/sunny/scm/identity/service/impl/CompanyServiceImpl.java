@@ -4,7 +4,6 @@ import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.identity.constant.IdentityErrorCode;
 import com.sunny.scm.identity.dto.company.UpdateCompanyRequest;
 import com.sunny.scm.identity.entity.Company;
-import com.sunny.scm.identity.mapper.CompanyMapper;
 import com.sunny.scm.identity.repository.CompanyRepository;
 import com.sunny.scm.identity.service.CompanyService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final CompanyMapper companyMapper;
     @Override
     public void updateCompany(UpdateCompanyRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -40,7 +38,12 @@ public class CompanyServiceImpl implements CompanyService {
                            throw new AppException(IdentityErrorCode.COMPANY_TAX_ID_ALREADY_EXISTS);
                         });
 
-        companyMapper.updateEntityFromDto(request, company);
+        company.setName(request.getCompanyName());
+        company.setAddress(request.getAddress());
+        company.setLegalName(request.getLegalName());
+        company.setTaxId(request.getTaxId());
+        company.setPhone(request.getCompanyPhone());
+
         companyRepository.save(company);
     }
 }

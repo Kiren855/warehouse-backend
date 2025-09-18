@@ -4,6 +4,7 @@ import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.product.constant.LogAction;
 import com.sunny.scm.product.constant.ProductErrorCode;
+import com.sunny.scm.product.constant.ProductStatus;
 import com.sunny.scm.product.dto.product.ProductDetailResponse;
 import com.sunny.scm.product.dto.product.CreateProductRequest;
 import com.sunny.scm.product.dto.product.ProductResponse;
@@ -11,6 +12,7 @@ import com.sunny.scm.product.dto.product.UpdateProductRequest;
 import com.sunny.scm.product.entity.Category;
 import com.sunny.scm.product.entity.Product;
 import com.sunny.scm.product.event.LoggingProducer;
+import com.sunny.scm.product.helper.ProductSpecifications;
 import com.sunny.scm.product.repository.CategoryRepository;
 import com.sunny.scm.product.repository.ProductRepository;
 import com.sunny.scm.product.service.CategoryService;
@@ -19,10 +21,10 @@ import com.sunny.scm.product.service.SkuSequenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -109,6 +111,35 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PageResponse<ProductResponse> getProducts(
+            String keyword,
+            int page, int size)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String companyId = jwt.getClaimAsString("company_id");
+
+
+        Specification<Product> spec = ProductSpecifications.belongsToCompany(Long.valueOf(companyId))
+                .and(ProductSpecifications.likeSkuOrName(keyword))
+                .and(ProductSpecifications.hasStatus(ProductStatus.ACTIVE));
+
+        Page<Product> products = productRepository.findAll(spec, PageRequest.of(page, size));
+
+        Page<ProductResponse> productResponses = products.map(product -> ProductResponse.builder()
+                .id(product.getId())
+                .productSku(product.getProductSku())
+                .productName(product.getProductName())
+                .categoryName(product.getCategory().getCategoryName())
+                .unit(product.getUnit())
+                .productType(product.getProductType().name())
+                .status(product.getStatus().name())
+                .build());
+
+        return PageResponse.from(productResponses);
+    }
+
+    @Override
     public PageResponse<ProductResponse> getProducts(int page, int size) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
@@ -123,10 +154,16 @@ public class ProductServiceImpl implements ProductService {
                 .productName(product.getProductName())
                 .categoryName(product.getCategory().getCategoryName())
                 .unit(product.getUnit())
+                .productType(product.getProductType().name())
                 .status(product.getStatus().name())
                 .build());
 
         return PageResponse.from(products);
+    }
+
+    @Override
+    public void changeStatus(Long productId, Boolean active) {
+
     }
 
 

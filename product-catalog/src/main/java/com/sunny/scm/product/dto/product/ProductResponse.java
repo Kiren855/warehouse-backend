@@ -22,4 +22,6 @@ public class ProductResponse {
     String categoryName;
     String unit;
     String status;
+    @JsonProperty("product_type")
+    String productType;
 }

@@ -16,7 +16,7 @@ public enum LogAction {
     ACTIVATE_PRODUCT("Activate product with SKU: %s"),
     DEACTIVATE_PRODUCT("Deactivate product with SKU: %s"),
     ADD_PRODUCT_PACKAGE("Add package %s to product with SKU: %s"),
-    REMOVE_PRODUCT_PACKAGE("Remove package %s from product with SKU: %s"),
+    REMOVE_PRODUCT_PACKAGE("Remove %s packages from product with SKU: %s"),
     UPDATE_PRODUCT_PACKAGE("Update package %s of product with SKU: %s"),;
     String value;
     LogAction(String value) {
