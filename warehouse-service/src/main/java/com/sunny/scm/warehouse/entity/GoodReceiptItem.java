@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -23,4 +25,7 @@ public class GoodReceiptItem extends BaseEntity {
 
     @Column(name = "package_quantity", nullable = false)
     Integer packageQuantity;
+
+    @Column(name = "expiration_date")
+    LocalDate expirationDate;
 }

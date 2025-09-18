@@ -20,4 +20,7 @@ public interface PutawayReservationRepository extends JpaRepository<PutawayReser
             "AND r.status = :status")
     List<PutawayReservation> findAllByWarehouseWithLock(@Param("warehouseId") Long warehouseId,
                                                         @Param("status") PutawayReservationStatus status);
+
+    void deleteByGroupReceiptId(Long groupReceiptId);
+    List<PutawayReservation> findByGroupReceiptId(Long groupReceiptId);
 }

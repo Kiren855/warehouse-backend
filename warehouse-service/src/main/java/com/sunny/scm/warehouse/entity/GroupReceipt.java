@@ -34,5 +34,8 @@ public class GroupReceipt extends BaseEntity {
 
     @Column(name = "putaway_list_url")
     private String putawayListUrl;
+
+    @OneToMany(mappedBy = "groupReceipt", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PutawayReservation> putawayReservations;
 }
 

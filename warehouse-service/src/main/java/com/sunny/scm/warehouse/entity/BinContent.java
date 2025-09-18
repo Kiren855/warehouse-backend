@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Table(
         name = "bin_contents",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"bin_id", "product_id"})
+                @UniqueConstraint(columnNames = {"bin_id", "product_package_id"})
         }
 )
 @FieldDefaults(level = AccessLevel.PRIVATE)

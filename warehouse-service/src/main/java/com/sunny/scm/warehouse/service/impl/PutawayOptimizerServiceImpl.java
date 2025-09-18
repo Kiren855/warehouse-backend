@@ -1,14 +1,17 @@
 package com.sunny.scm.warehouse.service.impl;
 
+import com.sunny.scm.common.exception.AppException;
 import com.sunny.scm.grpc.product.ProductPackageRpc;
 import com.sunny.scm.warehouse.client.ProductCatalogClient;
 import com.sunny.scm.warehouse.constant.PutawayReservationStatus;
+import com.sunny.scm.warehouse.constant.WarehouseErrorCode;
 import com.sunny.scm.warehouse.dto.receipt.CreateGoodReceiptRequest;
 import com.sunny.scm.warehouse.dto.receipt.GroupedPackageDto;
 import com.sunny.scm.warehouse.dto.receipt.ProductPackageDto;
 import com.sunny.scm.warehouse.dto.receipt.ProductPackageRequest;
 import com.sunny.scm.warehouse.dto.suggest.PutawaySuggestionDto;
 import com.sunny.scm.warehouse.entity.Bin;
+import com.sunny.scm.warehouse.entity.GroupReceipt;
 import com.sunny.scm.warehouse.entity.PutawayReservation;
 import com.sunny.scm.warehouse.repository.BinRepository;
 import com.sunny.scm.warehouse.repository.GoodReceiptItemRepository;
@@ -35,10 +38,14 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
     private final ProductCatalogClient productCatalogClient;
     private final PutawayReservationRepository putawayReservationRepository;
     private final GoodReceiptService goodReceiptService;
+    private final GroupReceiptRepository groupReceiptRepository;
 
     @Override
     @Transactional
     public List<PutawaySuggestionDto> optimizePutawaySuggestions(Long warehouseId, Long groupReceiptId) {
+        GroupReceipt groupReceipt = groupReceiptRepository.findById(groupReceiptId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.GROUP_RECEIPT_NOT_FOUND));
+
         CreateGoodReceiptRequest createGoodReceiptRequest = CreateGoodReceiptRequest.builder()
                 .productPackages(new ArrayList<>()).build();
 
@@ -72,7 +79,7 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
                 if (bestBin == null) {
                     ProductPackageRequest request = ProductPackageRequest.builder()
                             .productPackageId(product.getPackageId())
-                            .packageQuantity(product.getTotalQuantity())
+                            .packageQuantity(remainingQuantity)
                             .build();
                     createGoodReceiptRequest.getProductPackages().add(request);
                     break;
@@ -82,7 +89,7 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
 
                 // Tạo reservation
                 PutawayReservation reservation = PutawayReservation.builder()
-                        .putawayGroupId(groupReceiptId)
+                        .groupReceipt(groupReceipt)
                         .productPackageId(product.getPackageId())
                         .bin(bestBin)
                         .quantityReserved(quantityToPutaway)
@@ -113,7 +120,10 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
             }
         }
 
-        goodReceiptService.createGoodReceiptManual(warehouseId, createGoodReceiptRequest);
+        if(!createGoodReceiptRequest.getProductPackages().isEmpty()) {
+            goodReceiptService.createGoodReceiptManual(warehouseId, createGoodReceiptRequest);
+        }
+
         return suggestions;
     }
 

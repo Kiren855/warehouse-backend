@@ -16,5 +16,7 @@ public interface GroupReceiptService {
 
     void cancelGroupStatus(Long warehouseId, Long groupId);
 
+    void completeGroupStatus(Long warehouseId, Long groupId);
+
     byte[] downloadPutawayList(Long groupReceiptId) throws IOException;
 }

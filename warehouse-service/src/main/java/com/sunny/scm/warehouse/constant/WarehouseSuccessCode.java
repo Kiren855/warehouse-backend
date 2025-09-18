@@ -25,7 +25,8 @@ public enum WarehouseSuccessCode implements BaseCodeError {
     CREATE_GROUP_RECEIPT_SUCCESS("S30020", "Create group receipt success", HttpStatus.OK),
     GET_GROUP_RECEIPT_SUCCESS("S30021", "Get group receipt success", HttpStatus.OK),
     CANCEL_GOOD_RECEIPT_SUCCESS("S30022", "Cancel good receipt success", HttpStatus.OK),
-    GET_GROUPED_PACKAGES_SUCCESS("S30023", "Get grouped packages success", HttpStatus.OK),;
+    GET_GROUPED_PACKAGES_SUCCESS("S30023", "Get grouped packages success", HttpStatus.OK),
+    COMPLETE_GROUP_RECEIPT_SUCCESS("S30024", "Complete group receipt success", HttpStatus.OK),;
     String code;
     String message;
     HttpStatus httpStatus;

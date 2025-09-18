@@ -18,15 +18,4 @@ public class CreateGoodReceiptRequest {
     @JsonProperty("product_packages")
     List<ProductPackageRequest> productPackages;
 
-    public static GoodReceipt toEntity(CreateGoodReceiptRequest request) {
-        return GoodReceipt.builder()
-                .items(request.getProductPackages().stream()
-                        .map(pp -> GoodReceiptItem.builder()
-                                .productPackageId(pp.getProductPackageId())
-                                .packageQuantity(pp.getPackageQuantity())
-                                .build())
-                        .collect(Collectors.toSet()))
-                .receiptStatus(ReceiptStatus.PENDING)
-                .build();
-    }
 }

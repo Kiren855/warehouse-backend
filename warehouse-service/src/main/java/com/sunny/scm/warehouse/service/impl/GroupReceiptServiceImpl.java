@@ -7,22 +7,20 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.sunny.scm.common.constant.GlobalErrorCode;
 import com.sunny.scm.common.dto.PageResponse;
 import com.sunny.scm.common.exception.AppException;
+import com.sunny.scm.grpc.product.ProductPackageRpc;
 import com.sunny.scm.warehouse.client.AzureFileStorageClient;
+import com.sunny.scm.warehouse.client.ProductCatalogClient;
 import com.sunny.scm.warehouse.constant.LogAction;
 import com.sunny.scm.warehouse.constant.ReceiptStatus;
+import com.sunny.scm.warehouse.constant.TransactionType;
 import com.sunny.scm.warehouse.constant.WarehouseErrorCode;
 import com.sunny.scm.warehouse.dto.receipt.*;
 import com.sunny.scm.warehouse.dto.suggest.PutawaySuggestionDto;
-import com.sunny.scm.warehouse.entity.GoodReceipt;
-import com.sunny.scm.warehouse.entity.GroupReceipt;
-import com.sunny.scm.warehouse.entity.Warehouse;
+import com.sunny.scm.warehouse.entity.*;
 import com.sunny.scm.warehouse.event.LoggingProducer;
 import com.sunny.scm.warehouse.helper.EntityCodeGenerator;
 import com.sunny.scm.warehouse.helper.GroupReceiptSpecifications;
-import com.sunny.scm.warehouse.repository.GoodReceiptItemRepository;
-import com.sunny.scm.warehouse.repository.GroupReceiptRepository;
-import com.sunny.scm.warehouse.repository.ReceiptRepository;
-import com.sunny.scm.warehouse.repository.WarehouseRepository;
+import com.sunny.scm.warehouse.repository.*;
 import com.sunny.scm.warehouse.service.GroupReceiptService;
 import com.sunny.scm.warehouse.service.PutawayOptimizerService;
 import com.sunny.scm.warehouse.service.PutawayPdfService;
@@ -33,18 +31,25 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -58,7 +63,11 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
     private final PutawayOptimizerService putawayOptimizerService;
     private final PutawayPdfService putawayPdfService;
     private final AzureFileStorageClient azureFileStorageClient;
-    private final BlobServiceClient blobServiceClient;
+    private final PutawayReservationRepository putawayReservationRepository;
+    private final ProductCatalogClient productCatalogClient;
+    private final InventoryTransactionRepository inventoryTransactionRepository;
+    private final BinRepository binRepository;
+    private final BinContentRepository binContentRepository;
 
     private final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -145,6 +154,7 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
     }
 
     @Override
+    @Transactional
     public void cancelGroupStatus(Long warehouseId, Long groupId) {
         warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new AppException(WarehouseErrorCode.WAREHOUSE_NOT_FOUND));
@@ -156,6 +166,7 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
             throw new AppException(WarehouseErrorCode.GROUP_RECEIPT_ALREADY_CANCELLED);
         }
 
+        putawayReservationRepository.deleteByGroupReceiptId(groupReceipt.getId());
         groupReceipt.setReceiptStatus(ReceiptStatus.CANCELLED);
         groupReceipt.getReceipts().forEach(r -> r.setReceiptStatus(ReceiptStatus.CANCELLED));
         groupReceiptRepository.save(groupReceipt);
@@ -163,6 +174,120 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
         String action = LogAction.CANCEL_GROUP_RECEIPT.format(groupReceipt.getGroupCode());
         loggingProducer.sendMessage(action);
     }
+
+    @Transactional
+    @Override
+    public void completeGroupStatus(Long warehouseId, Long groupId) {
+        GroupReceipt groupReceipt = groupReceiptRepository.findById(groupId)
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.GROUP_RECEIPT_NOT_FOUND));
+
+        List<PutawayReservation> reservations = putawayReservationRepository.findByGroupReceiptId(groupId);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new AppException(GlobalErrorCode.UNAUTHENTICATED);
+        }
+        String userId = authentication.getName();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        long companyId = Long.parseLong(jwt.getClaimAsString("company_id"));
+
+        // Concurrent structures
+        Map<String, AtomicInteger> binContentMap = new ConcurrentHashMap<>();
+        List<InventoryTransaction> transactions = Collections.synchronizedList(new ArrayList<>());
+
+        // Async processing
+        List<CompletableFuture<Void>> futures = reservations.stream()
+                .map(reservation -> CompletableFuture.runAsync(() ->
+                                processSingleReservation(reservation, binContentMap, transactions, userId, companyId),
+                        virtualThreadExecutor))
+                .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        binContentMap.forEach((key, qty) -> {
+            String[] parts = key.split("-");
+            Long binId = Long.parseLong(parts[0]);
+            Long packageId = Long.parseLong(parts[1]);
+
+            Bin bin = binRepository.findById(binId)
+                    .orElseThrow(() -> new AppException(WarehouseErrorCode.BIN_NOT_FOUND));
+
+            BinContent binContent = binContentRepository
+                    .findByBinIdAndProductPackageId(binId, packageId)
+                    .orElse(BinContent.builder()
+                            .bin(bin)
+                            .productPackageId(packageId)
+                            .quantity(0)
+                            .build());
+
+            binContent.setQuantity(binContent.getQuantity() + qty.get());
+            binContentRepository.save(binContent);
+        });
+
+        inventoryTransactionRepository.saveAll(transactions);
+
+        putawayReservationRepository.deleteByGroupReceiptId(groupId);
+
+        groupReceipt.setReceiptStatus(ReceiptStatus.COMPLETED);
+        groupReceipt.getReceipts().forEach(r -> r.setReceiptStatus(ReceiptStatus.COMPLETED));
+        groupReceiptRepository.save(groupReceipt);
+
+        loggingProducer.sendMessage(LogAction.COMPLETE_GROUP_RECEIPT.format(groupReceipt.getGroupCode()));
+    }
+
+    private void processSingleReservation(PutawayReservation reservation,
+                                          Map<String, AtomicInteger> binContentMap,
+                                          List<InventoryTransaction> transactions,
+                                          String userId,
+                                          long companyId) {
+
+        Bin bin = binRepository.findById(reservation.getBin().getId())
+                .orElseThrow(() -> new AppException(WarehouseErrorCode.BIN_NOT_FOUND));
+
+        GroupedPackageDto groupedPackageDto = GroupedPackageDto.builder()
+                .productPackageId(reservation.getProductPackageId())
+                .totalQuantity((long) reservation.getQuantityReserved())
+                .build();
+        ProductPackageRpc productPackage = productCatalogClient
+                .getProductPackages(Collections.singletonList(groupedPackageDto)).get(0);
+
+        // Cập nhật bin
+        synchronized (bin) {
+            BigDecimal addVolume = new BigDecimal(productPackage.getLength())
+                    .multiply(new BigDecimal(productPackage.getWidth()))
+                    .multiply(new BigDecimal(productPackage.getHeight()))
+                    .multiply(BigDecimal.valueOf(reservation.getQuantityReserved()));
+
+            BigDecimal addWeight = new BigDecimal(productPackage.getWeight())
+                    .multiply(BigDecimal.valueOf(reservation.getQuantityReserved()));
+
+            bin.setCurrentVolumeUsed(bin.getCurrentVolumeUsed().add(addVolume));
+            bin.setCurrentWeightUsed(bin.getCurrentWeightUsed().add(addWeight));
+            binRepository.save(bin);
+        }
+
+        // Gom BinContent
+        String key = bin.getId() + "-" + reservation.getProductPackageId();
+        binContentMap.computeIfAbsent(key, k -> new AtomicInteger(0))
+                .addAndGet(reservation.getQuantityReserved());
+
+        // Tạo transaction
+        InventoryTransaction tx = InventoryTransaction.builder()
+                .companyId(companyId)
+                .packageProductId(productPackage.getPackageId())
+                .fromBin(null)
+                .toBin(bin)
+                .quantity(BigDecimal.valueOf(reservation.getQuantityReserved()))
+                .transactionType(TransactionType.INBOUND)
+                .referenceDocId(reservation.getGroupReceipt().getId())
+                .referenceDocType("GROUP_RECEIPT")
+                .transactionDate(LocalDateTime.now())
+                .userId(userId)
+                .note("Putaway completed")
+                .build();
+        transactions.add(tx);
+    }
+
 
     @Override
     public byte[] downloadPutawayList(Long groupReceiptId) throws IOException {

@@ -20,8 +20,10 @@ import reactor.core.publisher.Sinks;
 @Getter
 @Setter
 public class PutawayReservation extends BaseEntity {
-    @Column(name = "putaway_group_id", nullable = false)
-    Long putawayGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "putaway_group_id", nullable = false)
+    private GroupReceipt groupReceipt;
+
     @Column(name = "product_package_id", nullable = false)
     Long productPackageId;
 
