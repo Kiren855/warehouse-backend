@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -27,5 +30,8 @@ public class BinContent extends BaseEntity {
     Long productPackageId;
 
     @Column(name = "quantity", nullable = false)
-    Integer quantity;
+    BigDecimal quantity;
+
+    @Column(name = "expiration_date")
+    LocalDate expirationDate;
 }

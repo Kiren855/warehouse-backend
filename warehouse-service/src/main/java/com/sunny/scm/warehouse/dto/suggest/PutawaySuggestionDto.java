@@ -3,6 +3,8 @@ package com.sunny.scm.warehouse.dto.suggest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

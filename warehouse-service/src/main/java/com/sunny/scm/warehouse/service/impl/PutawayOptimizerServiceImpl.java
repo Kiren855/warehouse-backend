@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,13 +51,23 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
                 .productPackages(new ArrayList<>()).build();
 
          // 1. Lấy grouped products
-        List<GroupedPackageDto> groupedPackageDto = goodReceiptItemRepository.findGroupedItemsByGroupReceiptId(groupReceiptId);
+        List<GroupedPackageDto> groupedPackageDtos = goodReceiptItemRepository.findGroupedItemsByGroupReceiptId(groupReceiptId);
 
-        List<ProductPackageRpc> list = productCatalogClient.getProductPackages(groupedPackageDto);
+        List<ProductPackageRpc> list = productCatalogClient.getProductPackages(groupedPackageDtos);
+
+        Map<Long, LocalDate> expirationDateMap = new HashMap<>();
+        for (GroupedPackageDto dto : groupedPackageDtos) {
+            expirationDateMap.put(dto.getProductPackageId(), dto.getExpirationDate());
+        }
+
         List<ProductPackageDto> products = list.stream()
-                .map(ProductPackageDto::fromRpc)
-                .sorted(Comparator.comparing(ProductPackageDto::getVolume).reversed())
+                .map(p -> ProductPackageDto.fromRpc(p, expirationDateMap.get(p.getPackageId()))
+        )
+                .sorted(Comparator.comparing(
+                        ProductPackageDto::getVolume
+                ).reversed())
                 .toList();
+
         log.info("1. Fetched {} grouped products for GroupReceipt ID: {}", products.size(), groupReceiptId);
 
         // 2. Preload reservation với PESSIMISTIC_WRITE lock
@@ -80,6 +91,7 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
                     ProductPackageRequest request = ProductPackageRequest.builder()
                             .productPackageId(product.getPackageId())
                             .packageQuantity(remainingQuantity)
+                            .expirationDate(product.getExpirationDate())
                             .build();
                     createGoodReceiptRequest.getProductPackages().add(request);
                     break;
@@ -93,8 +105,10 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
                         .productPackageId(product.getPackageId())
                         .bin(bestBin)
                         .quantityReserved(quantityToPutaway)
+                        .expirationDate(product.getExpirationDate())
                         .status(PutawayReservationStatus.PENDING)
                         .build();
+
                 putawayReservationRepository.save(reservation);
 
                 // Cập nhật map để tính toán các lần lặp tiếp theo
@@ -154,7 +168,9 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
                     && bin.getHeight().compareTo(product.getHeight()) >= 0;
         }
 
-        if (existingReservations.stream().anyMatch(r -> !r.getProductPackageId().equals(product.getPackageId()))) {
+        if (existingReservations.stream().anyMatch(r ->
+                !r.getProductPackageId().equals(product.getPackageId())
+                        || !isExpirationDateCompatible(r.getExpirationDate(), product.getExpirationDate()))) {
             return false;
         }
 
@@ -194,4 +210,9 @@ public class PutawayOptimizerServiceImpl implements PutawayOptimizerService {
         return Math.min(remainingQuantity, Math.min(maxByVolume, maxByWeight));
     }
 
+    private boolean isExpirationDateCompatible(LocalDate existingExp, LocalDate newExp) {
+        if (existingExp == null && newExp == null) return true;
+        if (existingExp == null || newExp == null) return false;
+        return existingExp.equals(newExp);
+    }
 }

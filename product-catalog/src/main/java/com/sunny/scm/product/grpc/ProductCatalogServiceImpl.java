@@ -39,6 +39,7 @@ public class ProductCatalogServiceImpl extends ProductCatalogServiceGrpc.Product
                         .orElseThrow(() -> new AppException(ProductErrorCode.PACKAGE_NOT_EXIST));
                 log.info("2. Fetched ProductPackage with ID: {}", packageProduct.getId());
 
+
                 ProductPackageRpc packageRpc = ProductPackageRpc.newBuilder()
                         .setPackageId(packageProduct.getId())
                         .setProductId(packageProduct.getProduct().getId())

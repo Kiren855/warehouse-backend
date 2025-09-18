@@ -8,6 +8,8 @@ import lombok.experimental.FieldDefaults;
 import org.checkerframework.checker.units.qual.N;
 import reactor.core.publisher.Sinks;
 
+import java.time.LocalDate;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -33,6 +35,9 @@ public class PutawayReservation extends BaseEntity {
 
     @Column(name = "quantity_reserved", nullable = false)
     Integer quantityReserved;
+
+    @Column(name = "expiration_date")
+    LocalDate expirationDate;
 
     @Enumerated(EnumType.STRING)
     PutawayReservationStatus status;

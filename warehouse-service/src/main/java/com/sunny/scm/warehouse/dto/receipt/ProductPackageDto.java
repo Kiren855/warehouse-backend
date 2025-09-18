@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Builder
 @NoArgsConstructor
@@ -35,7 +36,10 @@ public class ProductPackageDto {
     @JsonProperty("total_quantity")
     int totalQuantity;
 
-    public static ProductPackageDto fromRpc(ProductPackageRpc rpc) {
+    @JsonProperty("expiration_date")
+    LocalDate expirationDate;
+
+    public static ProductPackageDto fromRpc(ProductPackageRpc rpc, LocalDate expirationDate) {
         return ProductPackageDto.builder()
                 .packageId(rpc.getPackageId())
                 .productId(rpc.getProductId())
@@ -49,6 +53,7 @@ public class ProductPackageDto {
                 .barcode(rpc.getBarcode())
                 .quantityInParent(rpc.getQuantityInParent())
                 .totalQuantity(rpc.getTotalQuantity())
+                .expirationDate(expirationDate)
                 .build();
     }
 

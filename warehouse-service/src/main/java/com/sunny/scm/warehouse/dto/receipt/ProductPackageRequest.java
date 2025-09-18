@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+
 @Getter
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
@@ -14,4 +16,7 @@ public class ProductPackageRequest {
 
     @JsonProperty("package_quantity")
     Integer packageQuantity;
+
+    @JsonProperty("expiration_date")
+    LocalDate expirationDate;
 }

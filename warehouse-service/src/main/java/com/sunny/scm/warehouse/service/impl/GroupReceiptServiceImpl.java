@@ -43,6 +43,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -208,21 +209,26 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
             String[] parts = key.split("-");
             Long binId = Long.parseLong(parts[0]);
             Long packageId = Long.parseLong(parts[1]);
+            LocalDate expirationDate = parts.length > 2 && !"null".equals(parts[2])
+                    ? LocalDate.parse(parts[2])
+                    : null;
 
             Bin bin = binRepository.findById(binId)
                     .orElseThrow(() -> new AppException(WarehouseErrorCode.BIN_NOT_FOUND));
 
             BinContent binContent = binContentRepository
-                    .findByBinIdAndProductPackageId(binId, packageId)
-                    .orElse(BinContent.builder()
+                    .findByBinIdAndProductPackageIdAndExpirationDate(binId, packageId, expirationDate)
+                    .orElseGet(() -> BinContent.builder()
                             .bin(bin)
-                            .productPackageId(packageId)
-                            .quantity(0)
+                            .productPackageId(packageId)   // chỉ lưu id
+                            .expirationDate(expirationDate) // có thể null
+                            .quantity(BigDecimal.ZERO)
                             .build());
 
-            binContent.setQuantity(binContent.getQuantity() + qty.get());
+            binContent.setQuantity(binContent.getQuantity().add(BigDecimal.valueOf(qty.get())));
             binContentRepository.save(binContent);
         });
+
 
         inventoryTransactionRepository.saveAll(transactions);
 
@@ -267,7 +273,9 @@ public class GroupReceiptServiceImpl implements GroupReceiptService {
         }
 
         // Gom BinContent
-        String key = bin.getId() + "-" + reservation.getProductPackageId();
+        String key = bin.getId() + "-" + reservation.getProductPackageId() + "-" +
+                (reservation.getExpirationDate() != null ? reservation.getExpirationDate() : "null");
+
         binContentMap.computeIfAbsent(key, k -> new AtomicInteger(0))
                 .addAndGet(reservation.getQuantityReserved());
 

@@ -2,6 +2,7 @@ package com.sunny.scm.product.dto.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sunny.scm.product.constant.ProductStatus;
+import com.sunny.scm.product.constant.ProductType;
 import com.sunny.scm.product.entity.Product;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
@@ -28,12 +29,17 @@ public class CreateProductRequest {
     @NotBlank(message = "Unit must not be blank")
     String unit;
 
+    @NotBlank(message = "Product type must not be blank")
+    @JsonProperty("product_type")
+    String productType;
+
     public static Product toEntity(CreateProductRequest request) {
         return Product.builder()
                 .productName(request.getProductName())
                 .description(request.getDescription())
                 .unit(request.getUnit())
-                .status(ProductStatus.INACTIVE)
+                .productType(ProductType.valueOf(request.getProductType()))
+                .status(ProductStatus.ACTIVE)
                 .build();
     }
 }

@@ -94,6 +94,7 @@ public class GoodReceiptServiceImpl implements GoodReceiptService {
             GoodReceiptItem receiptItem = GoodReceiptItem.builder()
                     .productPackageId(item.getProductPackageId())
                     .packageQuantity(item.getPackageQuantity())
+                    .expirationDate(item.getExpirationDate())
                     .goodReceipt(newReceipt)
                     .build();
             newReceipt.getItems().add(receiptItem);

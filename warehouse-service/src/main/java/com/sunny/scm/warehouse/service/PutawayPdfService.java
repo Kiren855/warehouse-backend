@@ -1,16 +1,16 @@
 package com.sunny.scm.warehouse.service;
 
-import com.sunny.scm.warehouse.dto.suggest.PutawaySuggestionDto;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.springframework.stereotype.Service;
+import com.sunny.scm.warehouse.dto.suggest.PutawaySuggestionDto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,13 +20,25 @@ public class PutawayPdfService {
 
     public byte[] generatePutawayPdf(Long putawayGroupId, List<PutawaySuggestionDto> suggestions) throws IOException {
         try (PDDocument document = new PDDocument()) {
+
+            // Bước 1: Tải font hỗ trợ tiếng Việt từ resources
+            InputStream fontStream = getClass().getResourceAsStream("/fonts/DejaVuSans.ttf");
+            InputStream boldFontStream = getClass().getResourceAsStream("/fonts/DejaVuSans-Bold.ttf");
+
+            // Kiểm tra font có tồn tại không
+            if (fontStream == null || boldFontStream == null) {
+                throw new IOException("Font files not found in resources folder.");
+            }
+
+            PDType0Font boldFont = PDType0Font.load(document, boldFontStream, true);
+            PDType0Font normalFont = PDType0Font.load(document, fontStream, true);
+
+            // Bước 2: Tạo trang và nội dung
             PDPage page = new PDPage(PDRectangle.A4);
             document.addPage(page);
 
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
 
-                PDType1Font boldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
-                PDType1Font normalFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
                 float margin = 50;
                 float yOffset = 750;
 
@@ -57,7 +69,6 @@ public class PutawayPdfService {
 
                 yOffset -= 20;
 
-                // Group suggestions by zone
                 Map<String, Map<String, List<PutawaySuggestionDto>>> groupedByZoneAndBin = suggestions.stream()
                         .collect(Collectors.groupingBy(
                                 PutawaySuggestionDto::getSuggestedZoneCode,
@@ -91,7 +102,6 @@ public class PutawayPdfService {
                         float tableY = yOffset;
                         float[] colWidths = {150, 100, 70, 100};
 
-                        // Table Header
                         String[] headers = {"Product Name (SKU)", "Barcode", "Quantity", "Putaway Date"};
 
                         contentStream.beginText();
@@ -105,7 +115,6 @@ public class PutawayPdfService {
 
                         tableY -= 15;
 
-                        // Table Rows
                         for (PutawaySuggestionDto item : binEntry.getValue()) {
                             contentStream.beginText();
                             contentStream.setFont(normalFont, 8);
@@ -116,7 +125,7 @@ public class PutawayPdfService {
                             contentStream.newLineAtOffset(colWidths[1], 0);
                             contentStream.showText(String.valueOf(item.getQuantityToPutaway()));
                             contentStream.newLineAtOffset(colWidths[2], 0);
-                            contentStream.showText("________________"); // Placeholder for signature/date
+                            contentStream.showText("________________");
                             contentStream.endText();
                             tableY -= 15;
 

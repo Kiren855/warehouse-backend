@@ -132,6 +132,7 @@ public class ProductServiceImpl implements ProductService {
                 .productName(product.getProductName())
                 .categoryName(product.getCategory().getCategoryName())
                 .unit(product.getUnit())
+                .productType(product.getProductType().name())
                 .status(product.getStatus().name())
                 .build());
 
@@ -153,6 +154,7 @@ public class ProductServiceImpl implements ProductService {
                 .productName(product.getProductName())
                 .categoryName(product.getCategory().getCategoryName())
                 .unit(product.getUnit())
+                .productType(product.getProductType().name())
                 .status(product.getStatus().name())
                 .build());
 

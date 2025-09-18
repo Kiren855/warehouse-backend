@@ -2,6 +2,7 @@ package com.sunny.scm.product.entity;
 
 import com.sunny.scm.common.base.BaseEntity;
 import com.sunny.scm.product.constant.ProductStatus;
+import com.sunny.scm.product.constant.ProductType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -37,6 +38,10 @@ public class Product extends BaseEntity {
     private String productName;
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "product_type", nullable = false)
+    private ProductType productType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

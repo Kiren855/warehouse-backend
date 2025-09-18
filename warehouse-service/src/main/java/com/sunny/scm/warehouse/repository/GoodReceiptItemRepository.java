@@ -10,11 +10,12 @@ import java.util.List;
 
 public interface GoodReceiptItemRepository extends JpaRepository<GoodReceiptItem, Long> {
 
-    @Query("SELECT new com.sunny.scm.warehouse.dto.receipt.GroupedPackageDto(item.productPackageId, SUM(item.packageQuantity)) " +
+    @Query("SELECT new com.sunny.scm.warehouse.dto.receipt.GroupedPackageDto(" +
+            "item.productPackageId, item.expirationDate, SUM(item.packageQuantity)) " +
             "FROM GoodReceiptItem item " +
             "JOIN item.goodReceipt receipt " +
             "JOIN receipt.groupReceipt group " +
             "WHERE group.id = :groupReceiptId " +
-            "GROUP BY item.productPackageId")
+            "GROUP BY item.productPackageId, item.expirationDate")
     List<GroupedPackageDto> findGroupedItemsByGroupReceiptId(@Param("groupReceiptId") Long groupReceiptId);
 }

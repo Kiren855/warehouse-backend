@@ -14,8 +14,8 @@
         <module name="gateway-service" />
         <module name="discoveryserver" />
         <module name="identity-service" />
-        <module name="logging-service" />
         <module name="grpc-common" />
+        <module name="logging-service" />
       </profile>
     </annotationProcessing>
   </component>
